@@ -2,25 +2,15 @@ from src.data_manager import DataManager
 from src.calendar_manager import CalendarManager
 from src.app import MainApp
 
+
 def main():
-    # Chemin vers votre fichier de données
-    data_path = 'data/your_data.csv'
+    # Chemin vers le fichier de données (dans l'url google sheets)
+    sheet_id = ***REMOVED***
 
-    # Initialisation des gestionnaires de données et de calendrier
-    data_manager = DataManager(data_path,type='spreadsheet')
-    calendar_manager = CalendarManager()
+    data_manager = DataManager(sheet_id, sheet_name=***REMOVED***)
 
-    # Initialisation de l'application principale
-    app = MainApp(data_manager, calendar_manager)
+    print(data_manager.excel_to_dataframe(***REMOVED***))
 
-    # Traitement des événements
-    app.process_events()
-
-    # Enregistrement du calendrier
-    calendar_file_path = 'output/my_calendar.ics'
-    app.save_calendar(calendar_file_path)
-
-    print("Le fichier ICS a été créé avec succès.")
 
 if __name__ == "__main__":
     main()
