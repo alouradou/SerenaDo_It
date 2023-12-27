@@ -15,12 +15,21 @@ def parse_merged_cell(sheet, row, col):
     return cell.value
 
 
+def compute_header(df):
+    two_first = df.iloc[0:2]
+    two_first = two_first.transpose()
+    first = two_first[0] + "," + two_first[1]
+
+    df.columns = first
+    return df
+
+
 class DataManager:
     def __init__(self, sheet_id, sheet_name=""):
         self.sheet_name = sheet_name
         # https://stackoverflow.com/questions/33713084/download-link-for-google-spreadsheets-csv-export-with-multiple-sheets
-        self.csv_url = "https://docs.google.com/spreadsheets/d/"+sheet_id+"/gviz/tq?tqx=out:csv&sheet="+sheet_name
-        self.xlsx_url = "https://docs.google.com/spreadsheets/d/"+sheet_id+"/export?format=xlsx&id="+sheet_id
+        self.csv_url = "https://docs.google.com/spreadsheets/d/" + sheet_id + "/gviz/tq?tqx=out:csv&sheet=" + sheet_name
+        self.xlsx_url = "https://docs.google.com/spreadsheets/d/" + sheet_id + "/export?format=xlsx&id=" + sheet_id
         self.workbook = self.load_workbook()
 
     def load_workbook(self):
@@ -46,10 +55,11 @@ class DataManager:
             parsed_row = [parse_merged_cell(sheet, row_idx, col_idx + 1) for col_idx, value in enumerate(row)]
             data.append(parsed_row)
 
-        headers = data[0]
-        df = pd.DataFrame(data[1:], columns=headers)
-        return df
-
+        try:
+            return compute_header(pd.DataFrame(data))
+        except Exception as e:
+            print(f"Input au header inattendu : {e}")
+            return pd.DataFrame(data)
 
 # Exemple d'utilisation
 # data_manager = DataManager('id_du_fichier')

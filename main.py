@@ -9,7 +9,9 @@ def main():
 
     data_manager = DataManager(sheet_id, sheet_name=***REMOVED***)
 
-    print(data_manager.excel_to_dataframe(***REMOVED***))
+    df = data_manager.excel_to_dataframe(***REMOVED***)
+
+    print(df)
 
 
 if __name__ == "__main__":
