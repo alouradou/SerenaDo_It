@@ -28,7 +28,6 @@ def generate_default_calendar():
         line_parser.parse()
         course_list += line_parser.course_list
 
-    print(course_list)
     cal = CalendarManager(course_list)
     cal.browse_course_list()
 
