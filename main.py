@@ -7,13 +7,7 @@ from src.app import MainApp
 from src.parse_excel_line import ParseExcelLine
 
 
-def compute_timetable_header(df):
-    two_first = df.iloc[0:2]
-    two_first = two_first.transpose()
-    first = two_first[0] + "," + two_first[1]
 
-    df.columns = first
-    return df
 
 
 def main():
@@ -23,7 +17,6 @@ def main():
     data_manager = DataManager(sheet_id, sheet_name=***REMOVED***)
 
     df = data_manager.excel_to_dataframe(***REMOVED***)
-    df = compute_timetable_header(df)
 
     date = datetime(2024, 1, 15)
 

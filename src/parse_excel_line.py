@@ -3,6 +3,16 @@ import pandas as pd
 
 from src.course import Course
 
+
+def compute_timetable_header(df):
+    two_first = df.iloc[0:2]
+    two_first = two_first.transpose()
+    first = two_first[0] + "," + two_first[1]
+
+    df.columns = first
+    return df
+
+
 jours_vers_chiffres = {
     "Lundi": 0,
     "Mardi": 1,
@@ -52,7 +62,7 @@ def is_course_continuation(previous, current):
 
 class ParseExcelLine:
     def __init__(self, df: pd.DataFrame, date: datetime):
-        line = select_week_from_date(df, date)
+        line = select_week_from_date(compute_timetable_header(df), date)
 
         self.line = line
         self.week_start_date = line["Semaine,du"].values[0]
