@@ -4,13 +4,7 @@ import pandas as pd
 from src.course import Course
 
 
-def compute_timetable_header(df):
-    two_first = df.iloc[0:2]
-    two_first = two_first.transpose()
-    first = two_first[0] + "," + two_first[1]
 
-    df.columns = first
-    return df
 
 
 jours_vers_chiffres = {
@@ -25,12 +19,16 @@ jours_vers_chiffres = {
 
 
 def select_week_from_date(df, date):
-    col_from = pd.to_datetime(df["Semaine,du"], format="%Y-%m-%d", errors='coerce')
-    col_to = pd.to_datetime(df["Semaine,au"], format="%Y-%m-%d", errors='coerce')
+    try:
+        col_from = pd.to_datetime(df["Semaine,du"], format="%Y-%m-%d", errors='coerce')
+        col_to = pd.to_datetime(df["Semaine,au"], format="%Y-%m-%d", errors='coerce')
 
-    selected_row = df.loc[(col_from <= date) & (date - timedelta(days=2) <= col_to)]
+        selected_row = df.loc[(col_from <= date) & (date - timedelta(days=2) <= col_to)]
 
-    return selected_row
+        return selected_row
+    except TypeError as e:
+        print(e)
+        return pd.DataFrame()
 
 
 def get_date_from_day_of_week(week_start_date, day_of_week):
@@ -62,7 +60,7 @@ def is_course_continuation(previous, current):
 
 class ParseExcelLine:
     def __init__(self, df: pd.DataFrame, date: datetime):
-        line = select_week_from_date(compute_timetable_header(df), date)
+        line = select_week_from_date(df, date)
 
         self.line = line
         self.week_start_date = line["Semaine,du"].values[0]

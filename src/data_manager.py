@@ -15,7 +15,13 @@ def parse_merged_cell(sheet, row, col):
     return cell.value
 
 
+def compute_timetable_header(df):
+    two_first = df.iloc[0:2]
+    two_first = two_first.transpose()
+    first = two_first[0] + "," + two_first[1]
 
+    df.columns = first
+    return df
 
 
 class DataManager:
