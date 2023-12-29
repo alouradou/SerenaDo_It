@@ -1,17 +1,22 @@
 from datetime import datetime, timedelta
-# from icalendar import Calendar, Event
+from icalendar import Calendar, Event
 
 
 class CalendarManager:
-    def __init__(self):
-        self.cal = None #Calendar()  # Initialisez votre calendrier ici
+    def __init__(self, course_list):
+        self.course_list = course_list
+        self.cal = Calendar()  # Initialisez votre calendrier ici
 
     def create_event(self, start_datetime, end_datetime, summary):
-        event = None#Event()
+        event = Event()
         event.add('summary', summary)
         event.add('dtstart', start_datetime)
         event.add('dtend', end_datetime)
         self.cal.add_component(event)
+
+    def browse_course_list(self):
+        for course in self.course_list:
+            self.create_event(course.start, course.end, course.description)
 
     def save_calendar(self, file_path):
         with open(file_path, 'wb') as f:

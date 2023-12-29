@@ -15,13 +15,7 @@ def parse_merged_cell(sheet, row, col):
     return cell.value
 
 
-def compute_header(df):
-    two_first = df.iloc[0:2]
-    two_first = two_first.transpose()
-    first = two_first[0] + "," + two_first[1]
 
-    df.columns = first
-    return df
 
 
 class DataManager:
@@ -55,11 +49,7 @@ class DataManager:
             parsed_row = [parse_merged_cell(sheet, row_idx, col_idx + 1) for col_idx, value in enumerate(row)]
             data.append(parsed_row)
 
-        try:
-            return compute_header(pd.DataFrame(data))
-        except Exception as e:
-            print(f"Input au header inattendu : {e}")
-            return pd.DataFrame(data)
+        return pd.DataFrame(data)
 
 # Exemple d'utilisation
 # data_manager = DataManager('id_du_fichier')
