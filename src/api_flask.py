@@ -8,15 +8,15 @@ from src.data_manager import DataManager, compute_timetable_header
 from src.calendar_manager import CalendarManager
 from src.parse_excel_line import ParseExcelLine
 
-
 cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
+cache_duration = 60 * 60  # in seconds
 
 app = Flask(__name__)
 cache.init_app(app)
 
-
 current_dir = os.path.abspath(os.path.dirname(__file__))
 app.template_folder = os.path.join(current_dir, '../frontend/templates')
+app.static_folder = os.path.join(current_dir, '../static')
 
 
 @app.route("/")
@@ -25,7 +25,7 @@ def hello_world():
 
 
 @app.route("/event-list")
-@cache.cached(timeout=60)
+@cache.cached(timeout=cache_duration)
 def get_event_list():
     # Chemin vers le fichier de données (dans l'url google sheets)
     sheet_id = ***REMOVED***
@@ -42,30 +42,37 @@ def get_event_list():
         line_parser = ParseExcelLine(df, week_date)
         line_parser.parse()
         course_list += line_parser.course_list
-    cache.set('course_list', course_list, timeout=60)
+    cache.set('course_list', course_list, timeout=cache_duration)
     return render_template('event-list.html', course_list=course_list)
 
 
 @app.route("/year-calendar")
 def get_calendar():
     # Call course list route first to cache the course list
-    get_event_list()
     course_list = cache.get('course_list')
+    if not course_list:
+        get_event_list()
     cal = CalendarManager(course_list)
     cal.browse_course_list()
 
     date = datetime.now()
     path = f'year-calendar.ics'
-    cal.save_calendar("./static/"+path)
+    cal.save_calendar("./static/" + path)
 
-    return render_template('calendar.html', path="/ics?path="+path)
+    return render_template('calendar.html', path="/ics?path=" + path)
+
+
+@app.route("/my-calendar")
+def get_personalization_menu():
+    return render_template('personalize.html')
+
 
 
 # TODO: check vulnerabilities
 @app.route("/ics", methods=['GET'])
 def get_ics_calendar_from_file():
     args = request.args
-    path = "./static/"+args.get('path')
+    path = "./static/" + args.get('path')
     with open(path, 'r') as f:
         return f.read()
 
@@ -74,8 +81,6 @@ def get_ics_calendar_from_file():
 def calendar():
     with open('./static/test-2024-01-15.ics', 'r') as f:
         return f.read()
-
-
 
 
 if __name__ == "__main__":
