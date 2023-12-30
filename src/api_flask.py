@@ -6,6 +6,7 @@ from flask_caching import Cache
 
 from src.data_manager import DataManager, compute_timetable_header
 from src.calendar_manager import CalendarManager
+from src.exel_manager import ExcelManager
 from src.parse_excel_line import ParseExcelLine
 
 cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
@@ -17,6 +18,7 @@ cache.init_app(app)
 current_dir = os.path.abspath(os.path.dirname(__file__))
 app.template_folder = os.path.join(current_dir, '../frontend/templates')
 app.static_folder = os.path.join(current_dir, '../static')
+app.config['UPLOAD_FOLDER'] = '../static/uploads'
 
 
 @app.route("/")
@@ -78,6 +80,20 @@ def get_personalization_menu():
     unique_desc = list(set(desc))
     return render_template('personalize.html', selectable_courses=unique_desc, course_list=course_list)
 
+
+@app.route('/upload', methods=['POST'])
+def upload_xlsx():
+    if 'file' in request.files:
+        file = request.files['file']
+        # filename = secure_filename(file.filename) : see https://stackabuse.com/step-by-step-guide-to-file-upload-with-flask/
+        filename = file.filename
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), ***REMOVED***)
+
+        return 'File uploaded successfully'
+
+    return 'No file uploaded'
 
 # TODO: check vulnerabilities
 @app.route("/ics", methods=['GET'])

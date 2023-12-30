@@ -14,18 +14,25 @@
                 <a href="/" class="back-button">Retour</a>
             </div>
             <h1>My SérénaDo_It</h1>
-            <p>Ce menu vous permettra de personnaliser votre calendrier avec les cours choisis</p>
-            <div class="button-container" data-loader-id="loader-year-calendar">
-                <a href="{{ path }}" class="btn-with-loader year-calendar">Lien d'abonnement au calendrier !</a>
-                <div class="loader" id="loader-year-calendar"></div>
-            </div>
+            <p>Ce menu vous permettra de personnaliser votre calendrier avec les cours choisis</p><br />
             <form class="event-list-container">
                 {% for course in selectable_courses %}
-                <label>
+                <label class="checkbox-label">
                     <input type="checkbox" name="{{ course }}" />
                     {{ course }}
                 </label>
                 {% endfor %}
+            </form>
+            <div class="button-container" data-loader-id="loader-year-calendar">
+                <a href="{{ path }}" class="btn-with-loader year-calendar">Lien d'abonnement personnalisé</a>
+                <div class="loader" id="loader-year-calendar"></div>
+            </div>
+
+            <h2>Upload File</h2>
+            <form action = "/upload" method = "POST"
+               enctype = "multipart/form-data">
+               <input type = "file" name = "file" />
+               <input type = "submit"/>
             </form>
         </div>
     </div>
