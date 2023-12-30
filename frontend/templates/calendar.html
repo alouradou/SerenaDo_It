@@ -5,12 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SérénaDo_It</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
 </head>
 <body>
-    <h1>Le calendrier :</h1>
-    <p>
-        <a href="{{ path }}">Lien d'abonnement au calendrier !</a>
-    </p>
-
+    <div class="container">
+        <div class="card">
+            <div class="back-button-container">
+                <a href="/" class="back-button">Retour</a>
+            </div>
+            <h1>Le calendrier</h1>
+            <div class="button-container" data-loader-id="loader-year-calendar">
+                <a href="{{ path }}" class="btn-with-loader year-calendar">Lien d'abonnement au calendrier !</a>
+                <div class="loader" id="loader-year-calendar"></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -5,13 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SérénaDo_It</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
 </head>
 <body>
-    <h1>La liste des cours de l'***REMOVED*** :</h1>
-    <ul>
-        {% for event in course_list %}
-            <li>{{ event.description }}</li>
-        {% endfor %}
-    </ul>
+    <div class="container">
+        <div class="card">
+            <div class="back-button-container">
+                <a href="/" class="back-button">Retour</a>
+            </div>
+            <h1>La liste des cours de l'***REMOVED***</h1>
+            <ul class="event-list-container">
+                {% for event in course_list %}
+                    <li>
+                        {{ event.description }}
+                        <span>Le {{ event.start.strftime("%d/%m") }} de {{ event.start.strftime("%Hh%M") }} à {{ event.end.strftime("%Hh%M") }}</span>
+
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </body>
 </html>
