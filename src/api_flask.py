@@ -27,13 +27,17 @@ def hello_world():
 @app.route("/event-list")
 @cache.cached(timeout=cache_duration)
 def get_event_list():
-    # Chemin vers le fichier de données (dans l'url google sheets)
-    sheet_id = ***REMOVED***
+    df = cache.get('df')
+    if not df:
+        # Chemin vers le fichier de données (dans l'url google sheets)
+        sheet_id = ***REMOVED***
 
-    data_manager = DataManager(sheet_id, sheet_name=***REMOVED***)
+        data_manager = DataManager(sheet_id, sheet_name=***REMOVED***)
 
-    df = data_manager.excel_to_dataframe(***REMOVED***)
-    df = compute_timetable_header(df)
+        df = data_manager.excel_to_dataframe(***REMOVED***)
+        df = compute_timetable_header(df)
+
+        cache.set('df', df, timeout=cache_duration)
 
     list_week_start_dates = df["Semaine,du"].iloc[2:].dropna()
 
@@ -52,6 +56,7 @@ def get_calendar():
     course_list = cache.get('course_list')
     if not course_list:
         get_event_list()
+        course_list = cache.get('course_list')
     cal = CalendarManager(course_list)
     cal.browse_course_list()
 
@@ -64,8 +69,14 @@ def get_calendar():
 
 @app.route("/my-calendar")
 def get_personalization_menu():
-    return render_template('personalize.html')
-
+    course_list = cache.get('course_list')
+    if not course_list:
+        get_event_list()
+        course_list = cache.get('course_list')
+    desc = [course_list[i].description for i in range(len(course_list))]
+    print(desc)
+    unique_desc = list(set(desc))
+    return render_template('personalize.html', selectable_courses=unique_desc, course_list=course_list)
 
 
 # TODO: check vulnerabilities

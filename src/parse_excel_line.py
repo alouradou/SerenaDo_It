@@ -4,9 +4,6 @@ import pandas as pd
 from src.course import Course
 
 
-
-
-
 jours_vers_chiffres = {
     "Lundi": 0,
     "Mardi": 1,
@@ -51,7 +48,7 @@ def translate_to_time(time_str):
 
 
 def is_course_continuation(previous, current):
-    if (previous.description == current.description
+    if (previous.cell_content == current.cell_content
             and (current.start - previous.end <= timedelta(minutes=30))):
         return True
     else:
@@ -71,7 +68,8 @@ class ParseExcelLine:
     def parse(self):
         for col in self.line:
             self.current_course = Course()
-            self.current_course.description = self.line[col].values[0]
+            self.current_course.cell_content = self.line[col].values[0]
+            self.current_course.get_description()
 
             # Splitting the header to get the day of the week and the time
             split = str(col).split(",")
@@ -93,7 +91,7 @@ class ParseExcelLine:
                 if is_course_continuation(self.previous_course, self.current_course):
                     self.current_course.start = self.previous_course.start
                 # Base case: Add only if there is a course to memorize
-                elif self.previous_course.description:
+                elif self.previous_course.cell_content:
                     self.course_list.append(self.previous_course)
 
                 self.previous_course = self.current_course
