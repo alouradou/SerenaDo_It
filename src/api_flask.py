@@ -87,11 +87,14 @@ def upload_xlsx():
         file = request.files['file']
         # filename = secure_filename(file.filename) : see https://stackabuse.com/step-by-step-guide-to-file-upload-with-flask/
         filename = file.filename
+        print(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
         excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), ***REMOVED***)
+        df = excel_manager.excel_to_dataframe(***REMOVED***)
+        df = compute_timetable_header(df)
 
-        return 'File uploaded successfully'
+        return 'File uploaded successfully'+str(df)
 
     return 'No file uploaded'
 
