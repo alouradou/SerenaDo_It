@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 loader.style.display = "none";
                 // Ajoutez ici le code pour rediriger vers la page spécifique
                 // window.location.href = btn.getAttribute("href");
-            }, 3000);
+            }, 6000);
         });
     });
 });
