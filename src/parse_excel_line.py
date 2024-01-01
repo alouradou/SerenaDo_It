@@ -105,4 +105,6 @@ class ParseExcelLine:
                 else:
                     raise e
 
-        self.course_list.append(self.previous_course)
+        # Border case: Add the last course if not None
+        if self.previous_course.cell_content:
+            self.course_list.append(self.previous_course)

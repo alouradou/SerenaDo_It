@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SérénaDo_It</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
 </head>
 <body>
     <div class="container">
@@ -18,7 +19,7 @@
             <form class="event-list-container">
                 {% for course in selectable_courses %}
                 <label class="checkbox-label">
-                    <input type="checkbox" name="{{ course }}" />
+                    <input type="checkbox" name="{{ course }}"  checked />
                     {{ course }}
                 </label>
                 {% endfor %}
@@ -29,7 +30,7 @@
             </div>
 
             <h2>Upload File</h2>
-            <form action = "/upload" method = "POST"
+            <form action = "/annee/source-excel" method = "POST"
                enctype = "multipart/form-data">
                <input type = "file" name = "file" />
                <input type = "submit"/>

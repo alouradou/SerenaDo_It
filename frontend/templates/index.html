@@ -6,25 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SérénaDo_It</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
 </head>
 <body>
     <div class="container">
         <div class="card">
             <h1>Bienvenue sur SérénaDo_It !</h1>
             <div class="button-container" data-loader-id="loader-event-list">
-                <a href="/event-list" class="btn-with-loader event-list-btn">La liste des cours de l'***REMOVED***</a>
+                <a href="/annee" class="btn-with-loader event-list-btn">La liste des cours de l'***REMOVED***</a>
                 <div class="loader" id="loader-event-list"></div>
             </div>
             <div class="button-container" data-loader-id="loader-year-calendar">
-                <a href="/year-calendar" class="btn-with-loader year-calendar">Le calendrier complet de l'***REMOVED***</a>
-                <div class="loader" id="loader-year-calendar"></div>
-            </div>
-            <div class="button-container" data-loader-id="loader-year-calendar">
-                <a href="/my-calendar" class="btn-with-loader year-calendar">Personnaliser mon calendrier</a>
+                <a href="/my-calendar" class="btn-with-loader year-calendar">Obtenir mon calendrier personnalisé</a>
                 <div class="loader" id="loader-personalize"></div>
             </div>
             <h2>Upload File</h2>
-            <form action = "/upload" method = "POST"
+            <form action = "/annee/source-excel" method = "POST"
                enctype = "multipart/form-data">
                <input type = "file" name = "file" />
                <input type = "submit"/>

@@ -6,6 +6,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SérénaDo_It</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+    <script>
+
+      document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'listWeek',  // Utilisez 'timeGridWeek' pour la vue semaine
+          height: 700,  // Hauteur du calendrier
+          events: [
+            {% for event in course_list %}
+              {
+                title: '{{ event.description }}',
+                start: '{{ event.start }}',  // Format de la date peut nécessiter des ajustements
+                end: '{{ event.end }}',      // Format de la date peut nécessiter des ajustements
+              },
+            {% endfor %}
+          ],
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+          },
+          firstDay: 1,  // Démarre la semaine le lundi
+          weekends: false,  // N'affiche pas les week-ends par défaut
+        });
+        calendar.render();
+      });
+
+    </script>
 </head>
 <body>
     <div class="container">
@@ -14,15 +44,9 @@
                 <a href="/" class="back-button">Retour</a>
             </div>
             <h1>La liste des cours de l'***REMOVED***</h1>
-            <ul class="event-list-container">
-                {% for event in course_list %}
-                    <li>
-                        {{ event.description }}
-                        <span>Le {{ event.start.strftime("%d/%m") }} de {{ event.start.strftime("%Hh%M") }} à {{ event.end.strftime("%Hh%M") }}</span>
-
-                    </li>
-                {% endfor %}
-            </ul>
+            <div id='calendar'></div>
+            <h2>Ajoutez les cours à votre calendrirer</h2>
+            <a href="{{ path }}" class="btn-with-loader year-calendar">Lien d'abonnement au calendrier !</a>
         </div>
     </div>
 </body>
