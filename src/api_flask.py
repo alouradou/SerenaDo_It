@@ -18,7 +18,7 @@ cache.init_app(app)
 current_dir = os.path.abspath(os.path.dirname(__file__))
 app.template_folder = os.path.join(current_dir, '../frontend/templates')
 app.static_folder = os.path.join(current_dir, '../static')
-app.config['UPLOAD_FOLDER'] = '../static/uploads'
+app.config['UPLOAD_FOLDER'] = './static/uploads'
 
 
 @app.route("/")
@@ -87,8 +87,13 @@ def upload_xlsx():
         file = request.files['file']
         # filename = secure_filename(file.filename) : see https://stackabuse.com/step-by-step-guide-to-file-upload-with-flask/
         filename = file.filename
-        print(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        print(f"Saving file to: {os.path.join(app.config['UPLOAD_FOLDER'], filename)}")
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        if os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'], filename)):
+            print(f"File saved successfully: {os.path.join(app.config['UPLOAD_FOLDER'], filename)}")
+        else:
+            print(f"Error saving file: {os.path.join(app.config['UPLOAD_FOLDER'], filename)}")
 
         excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), ***REMOVED***)
         df = excel_manager.excel_to_dataframe(***REMOVED***)
