@@ -7,13 +7,13 @@ body {
     padding: 0;
     display: flex;
     justify-content: center;
-    height: 100vh;
 }
 
 .container {
     max-width: 80vw;
     width: 100%;
     padding: 0 20px;
+    margin: 50px 0;
 }
 
 .card {
@@ -22,12 +22,18 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
     text-align: center;
-    margin: 50px 0;
     position: relative;
 }
 
-h1 {
+h1,h2,h3,h4,h5,h6 {
     color: #ffffff;
+}
+
+
+.logo {
+    background: #ffffff;
+    width: 200px;
+    margin:30px;
 }
 
 ul {
@@ -51,6 +57,49 @@ li {
 
 li span {
     font-weight: bold;
+}
+
+.columns {
+    color: #ffffff;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-gap: 40px;
+}
+
+.columns h3, .columns p {
+    text-align: left;
+}
+
+#upload-form {
+    max-width: 300px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.26);
+}
+
+/* Style des champs de formulaire */
+input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+/* Style du bouton de soumission */
+input[type="submit"] {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Style du bouton de soumission au survol */
+input[type="submit"]:hover {
+    background-color: #45a049;
 }
 
 a {
@@ -149,6 +198,7 @@ a.year-calendar:hover {
 #calendar {
     background: rgba(255, 255, 255, 0.45);
     padding: 20px;
+    margin-top: 20px;
 }
 
 #calendar a {

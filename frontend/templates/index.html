@@ -12,20 +12,36 @@
     <div class="container">
         <div class="card">
             <h1>Bienvenue sur SérénaDo_It !</h1>
+            <img src="{{ url_for('static', filename='images/logo_serenadoit.png') }}" alt="SérénaDo_It" class="logo">
             <div class="button-container" data-loader-id="loader-event-list">
-                <a href="/annee" class="btn-with-loader event-list-btn">La liste des cours de l'***REMOVED***</a>
+                <a href="/annee" class="btn-with-loader event-list-btn">La liste complète des cours de l'***REMOVED***</a>
                 <div class="loader" id="loader-event-list"></div>
             </div>
-            <div class="button-container" data-loader-id="loader-year-calendar">
-                <a href="/my-calendar" class="btn-with-loader year-calendar">Obtenir mon calendrier personnalisé</a>
-                <div class="loader" id="loader-personalize"></div>
+            <h2>Options de personnalisation</h2>
+            <div class="columns">
+
+                <div class="button-container" data-loader-id="loader-year-calendar">
+                    <h3>1. Choisir les matières à conserver dans son emploi du temps</h3>
+                    <a href="/my-calendar" class="btn-with-loader year-calendar">Choisir ses cours</a>
+                    <div class="loader" id="loader-personalize"></div>
+                    <p>Vous pouvez choisir les matières que vous voulez conserver dans votre calendrier. Les autres seront ignorées.</p>
+                </div>
+                <div class="upload-container">
+                    <h3>2. Choisir le fichier Excel avec ses matières</h3>
+                    <form action = "/annee/source-excel" method = "POST"
+                       enctype = "multipart/form-data" id="upload-form">
+                       <input type = "file" name = "file" />
+                       <input type = "submit" value="Uploader mon Excel"/>
+                    </form>
+                    <p>Une fois le fichier Excel uploadé, SérénaDo_It va automatiquement créer un lien d'abonnement personnalisé pour votre calendrier.
+                    Il vous suffira de copier ce lien et de l'ajouter à votre application favorite.</p>
+                </div>
+                <div class="auto-fetch-container">
+                    <h3>3. Choisir son nom dans la liste déroulante !</h3>
+                    <p>On va se sevir ici du travail de Duc pour obtenir directement les fichiers excels.</p>
+                    <a href="/eleves">Choisir son fichier dans la liste</a>
+                </div>
             </div>
-            <h2>Upload File</h2>
-            <form action = "/annee/source-excel" method = "POST"
-               enctype = "multipart/form-data">
-               <input type = "file" name = "file" />
-               <input type = "submit"/>
-            </form>
         </div>
     </div>
     <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>

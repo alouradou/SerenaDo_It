@@ -43,10 +43,14 @@
             <div class="back-button-container">
                 <a href="/" class="back-button">Retour</a>
             </div>
-            <h1>La liste des cours de l'***REMOVED***</h1>
+            <h1>La liste des cours de l'***REMOVED*** ({{ filename.split(".xlsx")[0] }})</h1>
+            <div id="calendar-info">
+                <a type="button" href="{{ 'webcal://' + host + path }}" role="button"  class="btn-with-loader year-calendar">
+                    S'abonner (recommandé)
+                </a>
+                <a href="{{ path }}" class="">Copier ce lien pour ajouter manuellement à votre application favorite</a>
+            </div>
             <div id='calendar'></div>
-            <h2>Ajoutez les cours à votre calendrirer</h2>
-            <a href="{{ path }}" class="btn-with-loader year-calendar">Lien d'abonnement au calendrier !</a>
         </div>
     </div>
 </body>

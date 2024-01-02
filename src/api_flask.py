@@ -1,7 +1,8 @@
 import os
 from datetime import datetime
 
-from flask import Flask, request, render_template, send_file
+import requests
+from flask import Flask, request, render_template, url_for, send_file
 from flask_caching import Cache
 
 from werkzeug.utils import secure_filename
@@ -9,6 +10,7 @@ from werkzeug.utils import secure_filename
 from src.data_manager import DataManager, compute_timetable_header
 from src.calendar_manager import CalendarManager
 from src.exel_manager import ExcelManager
+from src.github_files_manager import GithubFilesManager
 from src.parse_excel_line import ParseExcelLine
 
 cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
@@ -58,7 +60,59 @@ def get_event_list():
     path = f'year-calendar.ics'
     cal.save_calendar("./static/" + path)
 
-    return render_template('event-list.html', course_list=course_list, path="/ics?path=" + path)
+    return render_template('event-list.html',
+                           course_list=course_list,
+                           path="/ics?path=" + path,
+                           host=request.host_url.split("//")[1][:-1],
+                           filename="Général")
+
+
+@app.route("/eleves")
+def get_student_list():
+    gh = GithubFilesManager()
+    file_dict = gh.get_github_files()
+    print(file_dict)
+    return render_template('auto-fetch.html', file_list=file_dict)
+
+
+@app.route("/eleves/lien", methods=['GET'])
+def get_student_custom_calendar():
+    args = request.args
+    path = args.get('path')
+
+    response = requests.get(path)
+
+    if response.status_code == 200:
+        filename = secure_filename(path.split("/")[-1])
+        with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), 'wb') as f:
+            f.write(response.content)
+
+        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), ***REMOVED***)
+        df = excel_manager.excel_to_dataframe(***REMOVED***)
+        df = compute_timetable_header(df)
+
+        list_week_start_dates = df["Semaine,du"].iloc[2:].dropna()
+
+        course_list = []
+        for week_date in list_week_start_dates:
+            line_parser = ParseExcelLine(df, week_date)
+            line_parser.parse()
+            course_list += line_parser.course_list
+        cache.set('course_list_' + filename, course_list, timeout=cache_duration)
+
+        cal = CalendarManager(course_list)
+        cal.browse_course_list()
+
+        path = f'{filename}.ics'
+        cal.save_calendar("./static/" + path)
+
+        return render_template('event-list.html',
+                               course_list=course_list,
+                               path="/ics?path=" + path,
+                               host=request.host_url.split("//")[1][:-1],
+                               filename=path.split("/")[-1])
+
+    return 'No file uploaded'
 
 
 @app.route("/year-calendar")
@@ -123,7 +177,11 @@ def upload_xlsx():
         path = f'{filename}.ics'
         cal.save_calendar("./static/" + path)
 
-        return render_template('event-list.html', course_list=course_list, path="/ics?path=" + path)
+        return render_template('event-list.html',
+                               course_list=course_list,
+                               path="/ics?path=" + path,
+                               host=request.host_url.split("//")[1][:-1],
+                               filename=file.filename)
 
     return 'No file uploaded'
 
@@ -132,15 +190,21 @@ def upload_xlsx():
 @app.route("/ics", methods=['GET'])
 def get_ics_calendar_from_file():
     args = request.args
-    path = "./static/" + args.get('path')
+    path = "../static/" + args.get('path')
+
+    # Construire l'URL du site en utilisant url_for
+    site_url = request.host_url  # Cela récupère le domaine du site, y compris le protocole (http/https)
+
+    # Construire l'URL complète avec le chemin vers la route
+    full_url = url_for('get_ics_calendar_from_file', path=args.get('path'), _external=True)
 
     # Définir le MIME type comme 'text/calendar'
     mimetype = 'text/calendar'
 
-    # Ajouter le lien 'webcal'
+    # Ajouter le lien 'webcal' et 'S'abonner'
     response = send_file(path, mimetype=mimetype, as_attachment=True)
     response.headers['Content-Disposition'] = 'attachment;filename=calendar.ics'
-    response.headers['Link'] = '<{0}>; rel=preload; as=script'.format(url_for('get_ics_calendar_from_file', path=args.get('path'), _external=True))
+    response.headers['Link'] = f'<{site_url}webcal{full_url}>; rel=preload; as=script'
 
     return response
 
