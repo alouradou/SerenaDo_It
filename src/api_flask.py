@@ -31,7 +31,7 @@ def hello_world():
 
 
 @app.route("/annee")
-@cache.cached(timeout=0)
+@cache.cached(timeout=cache_duration)
 def get_event_list():
     df = cache.get('df')
     if not df:
