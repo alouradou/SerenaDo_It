@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 import requests
-from flask import Flask, request, render_template, url_for, send_file
+from flask import Flask, request, render_template, url_for, send_file, abort
 from flask_caching import Cache
 
 from werkzeug.utils import secure_filename
@@ -112,7 +112,7 @@ def get_student_custom_calendar():
                                host=request.host_url.split("//")[1][:-1],
                                filename=path.split("/")[-1])
 
-    return 'No file uploaded'
+    return abort(400, "Error fetching file")
 
 
 @app.route("/year-calendar")
@@ -175,7 +175,7 @@ def upload_xlsx():
         cal.browse_course_list()
 
         path = f'{filename}.ics'
-        cal.save_calendar("./static/" + path)
+        cal.save_calendar(os.path.join(app.config['UPLOAD_FOLDER'], path))
 
         return render_template('event-list.html',
                                course_list=course_list,
@@ -183,26 +183,35 @@ def upload_xlsx():
                                host=request.host_url.split("//")[1][:-1],
                                filename=file.filename)
 
-    return 'No file uploaded'
+    return abort(400, "No file uploaded")
 
 
 # TODO: check vulnerabilities
 @app.route("/ics", methods=['GET'])
 def get_ics_calendar_from_file():
-    args = request.args
-    path = "../static/" + args.get('path')
+    # Validation du paramètre 'path'
+    path = request.args.get('path')
+    if not path:
+        abort(400, "Le paramètre 'path' est manquant.")
+
+    # Sécurisation du chemin du fichier
+    safe_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(path))
+
+    # Vérification de l'existence du fichier
+    if not os.path.isfile(safe_path):
+        abort(404, "Fichier non trouvé.")
 
     # Construire l'URL du site en utilisant url_for
-    site_url = request.host_url  # Cela récupère le domaine du site, y compris le protocole (http/https)
+    site_url = request.host_url
 
     # Construire l'URL complète avec le chemin vers la route
-    full_url = url_for('get_ics_calendar_from_file', path=args.get('path'), _external=True)
+    full_url = url_for('get_ics_calendar_from_file', path=safe_path, _external=True)
 
     # Définir le MIME type comme 'text/calendar'
     mimetype = 'text/calendar'
 
     # Ajouter le lien 'webcal' et 'S'abonner'
-    response = send_file(path, mimetype=mimetype, as_attachment=True)
+    response = send_file(f"../uploads/{secure_filename(path)}", mimetype=mimetype, as_attachment=True)
     response.headers['Content-Disposition'] = 'attachment;filename=calendar.ics'
     response.headers['Link'] = f'<{site_url}webcal{full_url}>; rel=preload; as=script'
 
