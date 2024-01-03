@@ -22,7 +22,7 @@ cache.init_app(app)
 current_dir = os.path.abspath(os.path.dirname(__file__))
 app.template_folder = os.path.join(current_dir, '../frontend/templates')
 app.static_folder = os.path.join(current_dir, '../static')
-app.config['UPLOAD_FOLDER'] = '../uploads'
+app.config['UPLOAD_FOLDER'] = './uploads'
 
 
 @app.route("/")
@@ -214,6 +214,3 @@ def calendar():
     with open('./static/test-2024-01-15.ics', 'r') as f:
         return f.read()
 
-
-if __name__ == "__main__":
-    app.run(debug=True)
