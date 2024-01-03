@@ -22,7 +22,7 @@ cache.init_app(app)
 current_dir = os.path.abspath(os.path.dirname(__file__))
 app.template_folder = os.path.join(current_dir, '../frontend/templates')
 app.static_folder = os.path.join(current_dir, '../static')
-app.config['UPLOAD_FOLDER'] = './static/uploads'
+app.config['UPLOAD_FOLDER'] = '../uploads'
 
 
 @app.route("/")
@@ -58,7 +58,7 @@ def get_event_list():
     cal.browse_course_list()
 
     path = f'year-calendar.ics'
-    cal.save_calendar("./static/" + path)
+    cal.save_calendar(os.path.join(app.config['UPLOAD_FOLDER'], path))
 
     return render_template('event-list.html',
                            course_list=course_list,
@@ -104,7 +104,7 @@ def get_student_custom_calendar():
         cal.browse_course_list()
 
         path = f'{filename}.ics'
-        cal.save_calendar("./static/" + path)
+        cal.save_calendar(os.path.join(app.config['UPLOAD_FOLDER'], path))
 
         return render_template('event-list.html',
                                course_list=course_list,
@@ -127,7 +127,7 @@ def get_calendar():
 
     date = datetime.now()
     path = f'year-calendar.ics'
-    cal.save_calendar("./static/" + path)
+    cal.save_calendar(os.path.join(app.config['UPLOAD_FOLDER'], path))
 
     return render_template('calendar.html', path="/ics?path=" + path)
 

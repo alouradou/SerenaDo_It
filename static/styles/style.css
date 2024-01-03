@@ -29,6 +29,10 @@ h1,h2,h3,h4,h5,h6 {
     color: #ffffff;
 }
 
+.card h1 {
+    max-width: 80%;
+    margin: 0.67em auto;
+}
 
 .logo {
     background: #ffffff;
@@ -161,15 +165,16 @@ a.year-calendar:hover {
 
 .back-button-container {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 20px;
+    left: 20px;
 }
 
 .back-button {
     display: inline-block;
+    border: solid;
     padding: 10px;
     margin-top: 20px;
-    line-height: 2em;
+    line-height: 0.67em;
     text-decoration: none;
     color: #ffffff;
 }
@@ -199,8 +204,47 @@ a.year-calendar:hover {
     background: rgba(255, 255, 255, 0.45);
     padding: 20px;
     margin-top: 20px;
+    border-radius: 5px;
 }
 
 #calendar a {
     color: #000;
+}
+
+
+@media screen and (max-width: 768px) {
+    .columns {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .card {
+        margin: 10px;
+        padding: 10px;
+    }
+
+    #calendar {
+        padding: 30px 0;
+        margin: 0 -11px;
+    }
+    #calendar .fc-header-toolbar {
+        flex-direction: column-reverse;
+        gap: 15px;
+    }
+}
+
+@media screen and (max-width: 992px) {
+
+    .back-button-container {
+        display: flex;
+        position: initial;
+        margin-left: 20px;
+        top: unset;
+        left: unset;
+    }
 }
