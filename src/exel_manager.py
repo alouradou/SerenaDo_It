@@ -6,7 +6,6 @@ import requests
 from src.data_manager import parse_merged_cell
 
 
-# TODO: Test this class
 class ExcelManager:
     def __init__(self, path, sheet_name=""):
         self.sheet_name = sheet_name
