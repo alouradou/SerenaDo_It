@@ -45,7 +45,7 @@ def get_event_list():
 
         cache.set('df', df, timeout=cache_duration)
 
-    list_week_start_dates = df["Semaine,du"].iloc[2:].dropna()
+    list_week_start_dates = df["Semaine,du"].iloc[2:].dropna().drop_duplicates()
 
     course_list = []
     for week_date in list_week_start_dates:
