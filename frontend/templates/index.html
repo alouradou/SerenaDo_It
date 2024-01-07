@@ -57,7 +57,12 @@
     <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
     <script>
         function submitForm() {
-            document.getElementById("sheet-info-form").submit();
+            if (document.getElementById("sheet_id").value === "" || document.getElementById("sheet_name").value === "") {
+                window.location.href = "/annee";
+            }
+            else {
+                document.getElementById("sheet-info-form").submit();
+            }
         }
     </script>
 </body>
