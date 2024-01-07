@@ -30,20 +30,25 @@ def hello_world():
     return render_template('index.html')
 
 
-@app.route("/annee")
+@app.route("/annee", methods=['GET'])
 @cache.cached(timeout=cache_duration)
 def get_event_list():
-    df = cache.get('df')
-    if not df:
-        # Chemin vers le fichier de données (dans l'url google sheets)
+    custom_path = ""
+    if request.args.get('sheet_id') and request.args.get('sheet_name'):
+        sheet_id = request.args.get('sheet_id')
+        sheet_name = request.args.get('sheet_name')
+        custom_path = f"-{secure_filename(sheet_id)}-{secure_filename(sheet_name)}"
+    else:
         sheet_id = ***REMOVED***
+        sheet_name = ***REMOVED***
+    df = cache.get(f"df{custom_path}")
+    if not df:
+        data_manager = DataManager(sheet_id, sheet_name=sheet_name)
 
-        data_manager = DataManager(sheet_id, sheet_name=***REMOVED***)
-
-        df = data_manager.excel_to_dataframe(***REMOVED***)
+        df = data_manager.excel_to_dataframe(sheet_name)
         df = compute_timetable_header(df)
 
-        cache.set('df', df, timeout=cache_duration)
+        cache.set(f"df{custom_path}", df, timeout=cache_duration)
 
     list_week_start_dates = df["Semaine,du"].iloc[2:].dropna().drop_duplicates()
 
@@ -57,7 +62,7 @@ def get_event_list():
     cal = CalendarManager(course_list)
     cal.browse_course_list()
 
-    path = f'year-calendar.ics'
+    path = f'year-calendar{custom_path}.ics'
     cal.save_calendar(os.path.join(app.config['UPLOAD_FOLDER'], path))
 
     return render_template('event-list.html',

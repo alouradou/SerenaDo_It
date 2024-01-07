@@ -12,9 +12,19 @@
     <div class="container">
         <div class="card">
             <h1>Bienvenue sur SérénaDo_It !</h1>
-            <img src="{{ url_for('static', filename='images/logo_serenadoit.png') }}" alt="SérénaDo_It" class="logo">
+
+            <div class="form-container">
+                 <img src="{{ url_for('static', filename='images/logo_serenadoit.png') }}" alt="SérénaDo_It" class="logo">
+                <form action="/annee" method="GET" id="sheet-info-form">
+                    <label for="sheet_id">Id du google sheet</label>
+                    <input type="text" name="sheet_id" id="sheet_id" placeholder="sheet_id">
+                    <label for="sheet_name">Nom de la page EDT</label>
+                    <input type="text" name="sheet_name" id="sheet_name" placeholder="sheet_name">
+                </form>
+                <div class="loader" id="loader-form"></div>
+            </div>
             <div class="button-container" data-loader-id="loader-event-list">
-                <a href="/annee" class="btn-with-loader event-list-btn">La liste complète des cours de l'***REMOVED***</a>
+                <input type="submit" value="La liste complète des cours de l'***REMOVED***" class="btn-with-loader event-list-btn" onclick="submitForm()">
                 <div class="loader" id="loader-event-list"></div>
             </div>
             <h2>Options de personnalisation</h2>
@@ -45,5 +55,10 @@
         </div>
     </div>
     <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
+    <script>
+        function submitForm() {
+            document.getElementById("sheet-info-form").submit();
+        }
+    </script>
 </body>
 </html>
