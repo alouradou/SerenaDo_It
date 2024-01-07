@@ -23,8 +23,7 @@ def select_week_from_date(df, date):
         selected_row = df.loc[(col_from <= date) & (date - timedelta(days=2) <= col_to)]
 
         return selected_row
-    except TypeError as e:
-        print(e)
+    except TypeError:
         return pd.DataFrame()
 
 
@@ -83,8 +82,6 @@ class ParseExcelLine:
                 end_time = translate_to_time(time[1])
 
                 date = get_date_from_day_of_week(self.week_start_date, week_day)
-
-                print(date, self.week_start_date, week_day, time, start_time, end_time)
 
                 # Merge date and time
                 self.current_course.start = datetime.combine(date, start_time)
