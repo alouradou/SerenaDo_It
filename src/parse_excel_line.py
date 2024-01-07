@@ -30,8 +30,9 @@ def select_week_from_date(df, date):
 
 def get_date_from_day_of_week(week_start_date, day_of_week):
     try:
-        return week_start_date + timedelta(days=jours_vers_chiffres[day_of_week])
-    except KeyError:
+        return week_start_date + timedelta(days=jours_vers_chiffres[day_of_week.strip()])
+    except KeyError as e:
+        print(e)
         return None
 
 
@@ -82,6 +83,8 @@ class ParseExcelLine:
                 end_time = translate_to_time(time[1])
 
                 date = get_date_from_day_of_week(self.week_start_date, week_day)
+
+                print(date, self.week_start_date, week_day, time, start_time, end_time)
 
                 # Merge date and time
                 self.current_course.start = datetime.combine(date, start_time)

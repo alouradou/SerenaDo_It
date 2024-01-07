@@ -37,7 +37,7 @@ class DataManager:
         with open('tmp_workbook.xlsx', 'wb') as f:
             try:
                 f.write(file.content)
-                return openpyxl.load_workbook("./tmp_workbook.xlsx")
+                return openpyxl.load_workbook("./tmp_workbook.xlsx", data_only=True)
             except Exception as e:
                 raise Exception(f"Error loading workbook from {self.xlsx_url}: {e}")
 
