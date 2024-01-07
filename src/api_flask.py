@@ -31,7 +31,7 @@ def hello_world():
 
 
 @app.route("/annee", methods=['GET'])
-@cache.cached(timeout=cache_duration)
+@cache.cached(timeout=cache_duration, query_string=True)
 def get_event_list():
     custom_path = ""
     if request.args.get('sheet_id') and request.args.get('sheet_name'):
