@@ -19,9 +19,12 @@
             {% for event in course_list %}
               {
                 title: '{{ event.description }}',
-                start: '{{ event.start }}',  // Format de la date peut nécessiter des ajustements
-                end: '{{ event.end }}',      // Format de la date peut nécessiter des ajustements
+                location: '{{ event.location }}',
+                description: '{{ event.organizer }}',
+                start: '{{ event.start }}',
+                end: '{{ event.end }}',
               },
+            console.log('Description:', '{{ event.description }}'),
             {% endfor %}
           ],
           headerToolbar: {
