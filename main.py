@@ -14,11 +14,11 @@ def main():
 
 def generate_default_calendar():
     # Chemin vers le fichier de données (dans l'url google sheets)
-    sheet_id = ***REMOVED***
+    sheet_id = "***REMOVED***"
 
-    data_manager = DataManager(sheet_id, sheet_name=***REMOVED***)
+    data_manager = DataManager(sheet_id, sheet_name="***REMOVED***")
 
-    df = data_manager.excel_to_dataframe(***REMOVED***)
+    df = data_manager.excel_to_dataframe("***REMOVED***")
 
     list_week_start_dates = df["Semaine,du"].iloc[2:]
 

@@ -25,8 +25,9 @@ def compute_timetable_header(df):
 
 
 class DataManager:
-    def __init__(self, sheet_id, sheet_name=""):
+    def __init__(self, sheet_id, sheet_name="", saved_workbook_path="./tmp_workbook.xlsx"):
         self.sheet_name = sheet_name
+        self.saved_workbook_path = saved_workbook_path
         # https://stackoverflow.com/questions/33713084/download-link-for-google-spreadsheets-csv-export-with-multiple-sheets
         self.csv_url = "https://docs.google.com/spreadsheets/d/" + sheet_id + "/gviz/tq?tqx=out:csv&sheet=" + sheet_name
         self.xlsx_url = "https://docs.google.com/spreadsheets/d/" + sheet_id + "/export?format=xlsx&id=" + sheet_id
@@ -34,10 +35,10 @@ class DataManager:
 
     def load_workbook(self):
         file = requests.get(self.xlsx_url, allow_redirects=True)
-        with open('tmp_workbook.xlsx', 'wb') as f:
+        with open(self.saved_workbook_path, 'wb') as f:
             try:
                 f.write(file.content)
-                return openpyxl.load_workbook("./tmp_workbook.xlsx", data_only=True)
+                return openpyxl.load_workbook(self.saved_workbook_path, data_only=True)
             except Exception as e:
                 raise Exception(f"Error loading workbook from {self.xlsx_url}: {e}")
 
@@ -60,3 +61,28 @@ class DataManager:
 # Exemple d'utilisation
 # data_manager = DataManager('id_du_fichier')
 # event_data = data_manager.get_event_data(0)
+
+
+class StudentDataManager(DataManager):
+    def __init__(self, sheet_id, sheet_name="", saved_workbook_path="./tmp_workbook.xlsx",
+                 header_excel_filename="./header_cours_23_24.xlsx"):
+        super().__init__(sheet_id, sheet_name, saved_workbook_path)
+        self.header_excel_filename = header_excel_filename  # Header contenant le nom des matières
+        self.workbook = self.replace_header(self.workbook, self.sheet_name)
+        print(f"Saving workbook to {saved_workbook_path}")
+        self.workbook.save(saved_workbook_path)
+
+    def replace_header(self, workbook, sheet_name):
+        # Charger le document Excel avec les deux premières lignes fixes
+        header_wb = openpyxl.load_workbook(self.header_excel_filename)
+        header_sheet = header_wb.active
+
+        # Remplacer la deuxième ligne par les matières du fichier
+        for col in range(1, workbook[sheet_name].max_column + 1):
+            workbook[sheet_name].cell(row=2, column=col).value = header_sheet.cell(row=2, column=col).value
+            print(f"Replacing column {col} with {header_sheet.cell(row=2, column=col).value}")
+
+        return workbook
+
+
+

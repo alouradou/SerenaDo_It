@@ -39,8 +39,8 @@ def get_event_list():
         sheet_name = request.args.get('sheet_name')
         custom_path = f"-{secure_filename(sheet_id)}-{secure_filename(sheet_name)}"
     else:
-        sheet_id = ***REMOVED***
-        sheet_name = ***REMOVED***
+        sheet_id = "***REMOVED***"
+        sheet_name = "***REMOVED***"
     df = cache.get(f"df{custom_path}")
     if not df:
         data_manager = DataManager(sheet_id, sheet_name=sheet_name)
@@ -92,8 +92,8 @@ def get_student_custom_calendar():
         with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), 'wb') as f:
             f.write(response.content)
 
-        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), ***REMOVED***)
-        df = excel_manager.excel_to_dataframe(***REMOVED***)
+        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), "***REMOVED***")
+        df = excel_manager.excel_to_dataframe("***REMOVED***")
         df = compute_timetable_header(df)
 
         list_week_start_dates = df["Semaine,du"].iloc[2:].dropna()
@@ -163,8 +163,8 @@ def upload_xlsx():
         else:
             print(f"Error saving file: {os.path.join(app.config['UPLOAD_FOLDER'], filename)}")
 
-        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), ***REMOVED***)
-        df = excel_manager.excel_to_dataframe(***REMOVED***)
+        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), "***REMOVED***")
+        df = excel_manager.excel_to_dataframe("***REMOVED***")
         df = compute_timetable_header(df)
 
         list_week_start_dates = df["Semaine,du"].iloc[2:].dropna()
