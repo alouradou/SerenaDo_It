@@ -14,7 +14,7 @@ def main():
 
 def generate_default_calendar():
     # Chemin vers le fichier de données (dans l'url google sheets)
-    sheet_id = "***REMOVED***"
+    sheet_id = ""
 
     data_manager = DataManager(sheet_id, sheet_name="***REMOVED***")
 

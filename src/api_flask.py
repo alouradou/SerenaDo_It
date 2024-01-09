@@ -39,8 +39,8 @@ def get_event_list():
         sheet_name = request.args.get('sheet_name')
         custom_path = f"-{secure_filename(sheet_id)}-{secure_filename(sheet_name)}"
     else:
-        sheet_id = "***REMOVED***"
-        sheet_name = "***REMOVED***"
+        sheet_id = ""
+        sheet_name = ""
     df = cache.get(f"df{custom_path}")
     if not df:
         data_manager = DataManager(sheet_id, sheet_name=sheet_name)
