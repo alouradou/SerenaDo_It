@@ -1,0 +1,34 @@
+<!-- templates/student-list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SérénaDo_It</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="back-button-container">
+                <a href="/" class="back-button">Retour</a>
+            </div>
+            <h1>My SérénaDo_It</h1>
+            <p>Ce menu vous permettra de choisir à quel emploi du temps vous abonner à partir de la liste des élèves et du code de Duc.</p>
+             <form action = "/eleves/calendrier" method = "GET"
+               enctype = "multipart/form-data" id="auto-fetch-form">
+                <label>
+                    <select name="id" id="file-select">
+                            <option value="0"> -- </option>
+                        {% for index, student in student_df.iterrows() %}
+                            <option value="{{ index }}">{{ student["prénom"] }} {{ student["nom"] }} </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <input type="submit" value="Envoyer">
+            </form>
+        </div>
+    </div>
+</body>
+</html>
