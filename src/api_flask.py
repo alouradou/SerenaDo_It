@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import datetime
 
@@ -7,11 +8,12 @@ from flask_caching import Cache
 
 from werkzeug.utils import secure_filename
 
-from src.data_manager import DataManager, compute_timetable_header
+from src.data_manager import DataManager, compute_timetable_header, StudentDataManager
 from src.calendar_manager import CalendarManager
 from src.exel_manager import ExcelManager
 from src.github_files_manager import GithubFilesManager
 from src.parse_excel_line import ParseExcelLine
+import src.create_timetable as create_timetable
 
 cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
 cache_duration = 60 * 60  # in seconds
@@ -23,6 +25,11 @@ current_dir = os.path.abspath(os.path.dirname(__file__))
 app.template_folder = os.path.join(current_dir, '../frontend/templates')
 app.static_folder = os.path.join(current_dir, '../static')
 app.config['UPLOAD_FOLDER'] = './uploads'
+
+app.config['DEFAULT_SHEET_ID'] = ""
+app.config['DEFAULT_SHEET_NAME'] = ""
+app.config['DEFAULT_STUDENT_SHEET_ID'] = ""
+app.config['DEFAULT_STUDENT_SHEET_NAME'] = ""
 
 
 @app.route("/")
@@ -39,10 +46,79 @@ def get_event_list():
         sheet_name = request.args.get('sheet_name')
         custom_path = f"-{secure_filename(sheet_id)}-{secure_filename(sheet_name)}"
     else:
-        sheet_id = ""
-        sheet_name = ""
+        sheet_id = app.config['DEFAULT_SHEET_ID']
+        sheet_name = app.config['DEFAULT_SHEET_NAME']
     df = cache.get(f"df{custom_path}")
-    if not df:
+    if df is None:
+        data_manager = DataManager(sheet_id, sheet_name=sheet_name)
+
+        df = data_manager.excel_to_dataframe(sheet_name)
+        df = compute_timetable_header(df)
+
+        cache.set(f"df{custom_path}", df, timeout=cache_duration)
+
+    list_week_start_dates = df["Semaine,du"].iloc[2:].dropna().drop_duplicates()
+
+    course_list = []
+    for week_date in list_week_start_dates:
+        line_parser = ParseExcelLine(df, week_date)
+        line_parser.parse()
+        course_list += line_parser.course_list
+    cache.set('course_list', course_list, timeout=cache_duration)
+
+    cal = CalendarManager(course_list)
+    cal.browse_course_list()
+
+    path = f'year-calendar{custom_path}.ics'
+    cal.save_calendar(os.path.join(app.config['UPLOAD_FOLDER'], path))
+
+    return render_template('event-list.html',
+                           course_list=course_list,
+                           path="/ics?path=" + path,
+                           host=request.host_url.split("//")[1][:-1],
+                           filename="Général")
+
+
+@app.route("/eleves", methods=['GET'])
+def get_student_list():
+    student_sheet_id, student_sheet_name = app.config['DEFAULT_STUDENT_SHEET_ID'], app.config['DEFAULT_STUDENT_SHEET_NAME']
+
+    student_dm = StudentDataManager(student_sheet_id, student_sheet_name,
+                                    saved_workbook_path="./uploads/tmp.xlsx",
+                                    header_excel_filename="./static/header_cours_23_24.xlsx")
+
+    student_df = student_dm.excel_to_dataframe("effectif")
+
+    for index, student in student_df.iterrows():
+        print(index, student["nom"], student["prénom"])
+
+    return render_template('student-list.html', student_df=student_df)
+
+
+@app.route("/eleves/calendrier", methods=['GET'])
+def get_student_calendar_from_list():
+    student_id = int(request.args.get('id'))
+
+    sheet_id, sheet_name = app.config['DEFAULT_SHEET_ID'], app.config['DEFAULT_SHEET_NAME']
+    student_sheet_id, student_sheet_name = app.config['DEFAULT_STUDENT_SHEET_ID'], app.config['DEFAULT_STUDENT_SHEET_NAME']
+
+    student_dm = StudentDataManager(student_sheet_id, student_sheet_name,
+                                    saved_workbook_path="./uploads/tmp.xlsx",
+                                    header_excel_filename="./static/header_cours_23_24.xlsx")
+
+    timetable = create_timetable.CreateTimetable("./uploads/tmp_edt.xlsx", sheet_name,
+                                                 "./uploads/tmp.xlsx", student_sheet_name)
+
+    students_df = student_dm.excel_to_dataframe("effectif")
+
+    student = students_df.loc[students_df.index == student_id].iloc[0]
+    custom_path = f"-{secure_filename(student['prénom'])}-{secure_filename(student['nom'])}"
+    filename = f"./uploads/edt-{custom_path}.xlsx"
+
+    timetable.create_timetable_automatic(student["nom"], student["prénom"], filename)
+
+    df = cache.get(f"df{custom_path}")
+    if df is None:
         data_manager = DataManager(sheet_id, sheet_name=sheet_name)
 
         df = data_manager.excel_to_dataframe(sheet_name)
@@ -73,7 +149,7 @@ def get_event_list():
 
 
 @app.route("/github")
-def get_student_list():
+def get_github_file_list():
     gh = GithubFilesManager()
     file_dict = gh.get_github_files()
     print(file_dict)
@@ -92,8 +168,8 @@ def get_student_custom_calendar():
         with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), 'wb') as f:
             f.write(response.content)
 
-        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), "année")
-        df = excel_manager.excel_to_dataframe("année")
+        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), app.config['DEFAULT_SHEET_NAME'])
+        df = excel_manager.excel_to_dataframe(app.config['DEFAULT_SHEET_NAME'])
         df = compute_timetable_header(df)
 
         list_week_start_dates = df["Semaine,du"].iloc[2:].dropna()
@@ -163,8 +239,8 @@ def upload_xlsx():
         else:
             print(f"Error saving file: {os.path.join(app.config['UPLOAD_FOLDER'], filename)}")
 
-        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), "année")
-        df = excel_manager.excel_to_dataframe("année")
+        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), app.config['DEFAULT_SHEET_NAME'])
+        df = excel_manager.excel_to_dataframe(app.config['DEFAULT_SHEET_NAME'])
         df = compute_timetable_header(df)
 
         list_week_start_dates = df["Semaine,du"].iloc[2:].dropna()
@@ -227,4 +303,3 @@ def get_ics_calendar_from_file():
 def calendar():
     with open('./static/test-2024-01-15.ics', 'r') as f:
         return f.read()
-

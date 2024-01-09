@@ -84,5 +84,16 @@ class StudentDataManager(DataManager):
 
         return workbook
 
+    def excel_to_dataframe(self, sheet_name, start_row=1):
+        df = super().excel_to_dataframe(sheet_name, start_row)
+
+        # Lower all column names to avoid errors on course name comparison
+        df.columns = df.iloc[1]
+        df.columns = [col.lower() for col in df.columns]
+
+        df = df.drop([0, 1]).dropna(subset=["nom", "prénom"])
+
+        return df
+
 
 
