@@ -16,9 +16,9 @@ def generate_default_calendar():
     # Chemin vers le fichier de données (dans l'url google sheets)
     sheet_id = ""
 
-    data_manager = DataManager(sheet_id, sheet_name="***REMOVED***")
+    data_manager = DataManager(sheet_id, sheet_name="année")
 
-    df = data_manager.excel_to_dataframe("***REMOVED***")
+    df = data_manager.excel_to_dataframe("année")
 
     list_week_start_dates = df["Semaine,du"].iloc[2:]
 
