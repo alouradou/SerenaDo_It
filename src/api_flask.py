@@ -72,7 +72,7 @@ def get_event_list():
                            filename="Général")
 
 
-@app.route("/eleves")
+@app.route("/github")
 def get_student_list():
     gh = GithubFilesManager()
     file_dict = gh.get_github_files()
@@ -80,7 +80,7 @@ def get_student_list():
     return render_template('auto-fetch.html', file_list=file_dict)
 
 
-@app.route("/eleves/lien", methods=['GET'])
+@app.route("/github/calendrier", methods=['GET'])
 def get_student_custom_calendar():
     args = request.args
     path = args.get('path')
