@@ -147,10 +147,16 @@ class CreateTimetable:
         return None
 
     def create_timetable_automatic(self, nom, prenom, filename):
-        courses_name = ["Bonjour !", "tc1 : agilité", "lancement projet 3a", "tc1 : gestion des sources",
-                        "tc1 : service design", "langues", "projet 3a", "vacances", "filière métier", "tronc commun 3a",
-                        "prez mon 2", "prez pok", "point pok sprint 1", "point pok sprint 2", "prez mon 1", "pok&mon",
-                        "cap 1a/3a/conception si", "prez projet", "rencontre w3g", "débrief", "conférence métier"]
+        courses_name = [
+            "bonjour !", "tc1 : agilité", "lancement projet 3a", "tc1 : système d'information",
+            "tc1 : gestion des sources", "tc1 : service design", "prez &pok", "do_it circus",
+            "langues", "projet 3a", "vacances", "filière métier", "tronc commun 3a",
+            "prez mon 2", "prez pok", "point pok sprint 1", "point pok sprint 2", "prez mon 1", "pok&mon",
+            "cap 1a/3a/conception si", "prez projet", "rencontre w3g", "débrief", "conférence métier",
+            # TODO: a commenter pour vraiment tester, ces matières ne sont pas correctement gérées
+            "architecture si", "stratégje & si", "people analytics"
+            # ENDTODO
+        ]
 
         row_number = self.find_student_row(nom, prenom)
 
@@ -182,7 +188,10 @@ class CreateTimetable:
                         if "\n" in course_name:
                             course_name = course_name[:len(course_name) - 1]
                             break
-                    if course_name not in courses_name:
+                    # Vérifier si course_name (en minuscules) contient l'un des cours de courses_name
+                    found_match = any(course.lower() in course_name for course in courses_name)
+
+                    if not found_match:
                         course_duration = self.get_course_duration(cell)
                         self.remove_course_automatic(cell, course_duration)
                     else:
