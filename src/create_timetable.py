@@ -132,20 +132,29 @@ class CreateTimetable:
                 return (mergedCell.max_col - mergedCell.min_col + 1)
         return (1)
 
+    def find_student_row(self, nom, prenom):
+        for k in range(3, self.sheet2.max_row + 1):
+            cell_nom = self.sheet2.cell(row=k, column=1)
+            cell_prenom = self.sheet2.cell(row=k, column=2)
+
+            # Ignorer les lignes vides
+            if cell_nom.value is None or cell_prenom.value is None:
+                continue
+
+            if prenom.lower() == cell_prenom.value.lower() and nom.lower() == cell_nom.value.lower():
+                return k
+        print("Nom ou prénom invalide")
+        return None
+
     def create_timetable_automatic(self, nom, prenom, filename):
-        courses_name = ["bonjour !", "tc1 : agilité", "lancement projet 3a", "tc1 : gestion des sources",
+        courses_name = ["Bonjour !", "tc1 : agilité", "lancement projet 3a", "tc1 : gestion des sources",
                         "tc1 : service design", "langues", "projet 3a", "vacances", "filière métier", "tronc commun 3a",
                         "prez mon 2", "prez pok", "point pok sprint 1", "point pok sprint 2", "prez mon 1", "pok&mon",
                         "cap 1a/3a/conception si", "prez projet", "rencontre w3g", "débrief", "conférence métier"]
-        row_number = None
-        for k in range(3, 27):
-            cell_nom = self.sheet2.cell(row=k, column=1)
-            cell_prenom = self.sheet2.cell(row=k, column=2)
-            if prenom.lower() == cell_prenom.value.lower() and nom.lower() == cell_nom.value.lower():
-                row_number = k
-                break
-        if row_number == None:
-            print("Nom ou prénom invalide")
+
+        row_number = self.find_student_row(nom, prenom)
+
+        if row_number is None:
             return ()
         for k in range(7, 30):
             cell = self.sheet2.cell(row=row_number, column=k)
