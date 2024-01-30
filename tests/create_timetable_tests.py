@@ -32,7 +32,7 @@ class TestCreateTimetable(unittest.TestCase):
         self.timetable = CreateTimetable(
             edt_file_name='../uploads/edt Do_It.23-24.xlsx',
             edt_sheet_name='année',
-            students_file_name='../uploads/choix.xlsx',
+            students_file_name='../static/header_etudiants_do_it.xlsx',
             students_sheet_name='effectif'
         )
         # Initialiser la feuille 2 avec des données de test
