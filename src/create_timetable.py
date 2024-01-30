@@ -154,7 +154,8 @@ class CreateTimetable:
             "prez mon 2", "prez pok", "point pok sprint 1", "point pok sprint 2", "prez mon 1", "pok&mon",
             "cap 1a/3a/conception si", "prez projet", "rencontre w3g", "débrief", "conférence métier", "stage 3a",
             # TODO: a commenter pour vraiment tester, ces matières ne sont pas correctement gérées
-            "architecture si", "stratégje & si", "people analytics", "it & dynamique organisationnelle"
+            "architecture si", "Architecture des SI", "stratégje & si",
+            "people analytics", "it & dynamique organisationnelle", "cybersécu", 'conf  "product manager"',
             # ENDTODO
         ]
 
