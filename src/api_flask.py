@@ -13,7 +13,7 @@ from src.calendar_manager import CalendarManager
 from src.exel_manager import ExcelManager
 from src.github_files_manager import GithubFilesManager
 from src.parse_excel_line import ParseExcelLine
-import src.create_timetable as create_timetable
+import src.personalize_timetable as personalize_timetable
 
 cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
 cache_duration = 60 * 60  # in seconds
@@ -76,21 +76,18 @@ def get_event_list():
                            course_list=course_list,
                            path="/ics?path=" + path,
                            host=request.host_url.split("//")[1][:-1],
-                           filename="Général")
+                           displayed_name="Général")
 
 
 @app.route("/eleves", methods=['GET'])
 def get_student_list():
-    student_sheet_id, student_sheet_name = app.config['DEFAULT_STUDENT_SHEET_ID'], app.config['DEFAULT_STUDENT_SHEET_NAME']
+    student_sheet_id = app.config['DEFAULT_STUDENT_SHEET_ID']
+    student_sheet_name = app.config['DEFAULT_STUDENT_SHEET_NAME']
 
     student_dm = StudentDataManager(student_sheet_id, student_sheet_name,
-                                    saved_workbook_path="./uploads/tmp.xlsx",
-                                    header_excel_filename="./static/header_cours_23_24.xlsx")
+                                    saved_workbook_path="./uploads/tmp_students.xlsx",)
 
-    student_df = student_dm.excel_to_dataframe("effectif")
-
-    for index, student in student_df.iterrows():
-        print(index, student["nom"], student["prénom"])
+    student_df = student_dm.excel_to_dataframe(student_sheet_name)
 
     return render_template('student-list.html', student_df=student_df)
 
@@ -100,52 +97,52 @@ def get_student_calendar_from_list():
     student_id = int(request.args.get('id'))
 
     sheet_id, sheet_name = app.config['DEFAULT_SHEET_ID'], app.config['DEFAULT_SHEET_NAME']
-    student_sheet_id, student_sheet_name = app.config['DEFAULT_STUDENT_SHEET_ID'], app.config['DEFAULT_STUDENT_SHEET_NAME']
+    student_sheet_id = app.config['DEFAULT_STUDENT_SHEET_ID']
+    student_sheet_name = app.config['DEFAULT_STUDENT_SHEET_NAME']
 
+    # Chargement des étudiants
     student_dm = StudentDataManager(student_sheet_id, student_sheet_name,
-                                    saved_workbook_path="./uploads/tmp.xlsx",
-                                    header_excel_filename="./static/header_cours_23_24.xlsx")
+                                    saved_workbook_path="./uploads/tmp_students.xlsx")
+    students_df = student_dm.excel_to_dataframe(student_sheet_name)
 
-    timetable = create_timetable.CreateTimetable("./uploads/tmp_edt.xlsx", sheet_name,
-                                                 "./uploads/tmp.xlsx", student_sheet_name)
-
-    students_df = student_dm.excel_to_dataframe("effectif")
+    # Chargement de l'emploi du temps
+    planning_dm = DataManager(sheet_id, sheet_name,
+                              saved_workbook_path="./uploads/tmp_edt.xlsx")
+    planning_dm.load_workbook()
+    timetable = personalize_timetable.PersonalizeTimetable(
+        "./uploads/tmp_edt.xlsx", sheet_name,
+        "./uploads/tmp_students.xlsx", student_sheet_name)
 
     student = students_df.loc[students_df.index == student_id].iloc[0]
-    custom_path = f"-{secure_filename(student['prénom'])}-{secure_filename(student['nom'])}"
+    print(student)
+    custom_path = f"{secure_filename(student['prénom'])}-{secure_filename(student['nom'])}"
     filename = f"./uploads/edt-{custom_path}.xlsx"
 
     timetable.create_timetable_automatic(student["nom"], student["prénom"], filename)
 
-    df = cache.get(f"df{custom_path}")
-    if df is None:
-        data_manager = DataManager(sheet_id, sheet_name=sheet_name)
+    data_manager = ExcelManager(filename, sheet_name)
 
-        df = data_manager.excel_to_dataframe(sheet_name)
-        df = compute_timetable_header(df)
+    df = data_manager.excel_to_dataframe(sheet_name)
+    df = compute_timetable_header(df)
 
-        cache.set(f"df{custom_path}", df, timeout=cache_duration)
-
-    list_week_start_dates = df["Semaine,du"].iloc[2:].dropna().drop_duplicates()
+    list_week_start_dates = df["Semaine,du"].iloc[2:].dropna()
 
     course_list = []
     for week_date in list_week_start_dates:
         line_parser = ParseExcelLine(df, week_date)
         line_parser.parse()
         course_list += line_parser.course_list
-    cache.set('course_list', course_list, timeout=cache_duration)
-
     cal = CalendarManager(course_list)
     cal.browse_course_list()
 
-    path = f'year-calendar{custom_path}.ics'
+    path = f'year-calendar-{custom_path}.ics'
     cal.save_calendar(os.path.join(app.config['UPLOAD_FOLDER'], path))
 
     return render_template('event-list.html',
                            course_list=course_list,
                            path="/ics?path=" + path,
                            host=request.host_url.split("//")[1][:-1],
-                           filename="Général")
+                           displayed_name=f"{student['prénom']} {student['nom']}")
 
 
 @app.route("/github")
@@ -168,7 +165,8 @@ def get_student_custom_calendar():
         with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), 'wb') as f:
             f.write(response.content)
 
-        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), app.config['DEFAULT_SHEET_NAME'])
+        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename),
+                                     app.config['DEFAULT_SHEET_NAME'])
         df = excel_manager.excel_to_dataframe(app.config['DEFAULT_SHEET_NAME'])
         df = compute_timetable_header(df)
 
@@ -191,7 +189,7 @@ def get_student_custom_calendar():
                                course_list=course_list,
                                path="/ics?path=" + path,
                                host=request.host_url.split("//")[1][:-1],
-                               filename=path.split("/")[-1])
+                               displayed_name=path.split("/")[-1])
 
     return abort(400, "Error fetching file")
 
@@ -239,7 +237,8 @@ def upload_xlsx():
         else:
             print(f"Error saving file: {os.path.join(app.config['UPLOAD_FOLDER'], filename)}")
 
-        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename), app.config['DEFAULT_SHEET_NAME'])
+        excel_manager = ExcelManager(os.path.join(app.config['UPLOAD_FOLDER'], filename),
+                                     app.config['DEFAULT_SHEET_NAME'])
         df = excel_manager.excel_to_dataframe(app.config['DEFAULT_SHEET_NAME'])
         df = compute_timetable_header(df)
 
@@ -262,7 +261,7 @@ def upload_xlsx():
                                course_list=course_list,
                                path="/ics?path=" + path,
                                host=request.host_url.split("//")[1][:-1],
-                               filename=file.filename)
+                               displayed_name=file.filename)
 
     return abort(400, "No file uploaded")
 

@@ -68,7 +68,10 @@ class StudentDataManager(DataManager):
                  header_excel_filename="./header_cours_23_24.xlsx"):
         super().__init__(sheet_id, sheet_name, saved_workbook_path)
         self.header_excel_filename = header_excel_filename  # Header contenant le nom des matières
-        self.workbook = self.replace_header(self.workbook, self.sheet_name)
+        try:
+            self.workbook = self.replace_header(self.workbook, self.sheet_name)
+        except FileNotFoundError:
+            print("StudentDataManager: Header file not found. Skipping header replacement.")
         print(f"Saving workbook to {saved_workbook_path}")
         self.workbook.save(saved_workbook_path)
 
