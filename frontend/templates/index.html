@@ -21,48 +21,37 @@
                     <label for="sheet_name">Nom de la page EDT</label>
                     <input type="text" name="sheet_name" id="sheet_name" placeholder="sheet_name" value="{{ config['DEFAULT_SHEET_NAME'] }}">
                 </form>
-                <div class="loader" id="loader-form"></div>
             </div>
             <div class="button-container" data-loader-id="loader-event-list">
-                <input type="submit" value="La liste complète des cours de l'année" class="btn-with-loader event-list-btn" onclick="submitForm()">
+                <input type="submit" value="La liste complète des cours de l'année" class="btn-with-loader event-list-btn" onclick="submitForm('/annee')">
                 <div class="loader" id="loader-event-list"></div>
             </div>
             <h2>Options de personnalisation</h2>
-            <div class="columns">
-                <div class="upload-container">
-                    <h3>1. Choisir le fichier Excel avec ses matières</h3>
-                    <form action = "/annee/source-excel" method = "POST"
-                       enctype = "multipart/form-data" id="upload-form">
-                       <input type = "file" name = "file" />
-                       <input type = "submit" value="Uploader mon Excel"/>
-                    </form>
-                    <p>Une fois le fichier Excel uploadé, SérénaDo_It va automatiquement créer un lien d'abonnement personnalisé pour votre calendrier.
-                    Il vous suffira de copier ce lien et de l'ajouter à votre application favorite.</p>
-                </div>
+            <div class="columns form-container">
                 <div class="auto-fetch-container">
-                    <h3>2. Choisir un fichier dans le github de Do_It</h3>
-                    <p>Méthode stable.</p>
-                    <p>On va se sevir ici du travail de Duc pour obtenir directement les fichiers excels générés.</p>
-                    <a href="/github" class="btn-with-loader event-list-btn">Choisir son fichier dans la liste</a>
-                </div>
-                <div class="auto-fetch-container">
-                    <h3>3. Choisir son nom dans la liste déroulante !</h3>
-                    <p>La liste des élèves est acquise depuis la Google Spreadsheet du choix des matières.</p>
-                    <p>Ensuite, on télécharge les matières ou chaque élève n'a pas renseigné de croix (x/X).</p>
-                    <p>Enfin, on supprime les cours dont le nom correspond à ces matières avec le script de Duc.</p>
-                    <a href="/eleves" class="btn-with-loader event-list-btn">Choisir son fichier dans la liste</a>
+                    <p>
+                        La liste des élèves est acquise depuis la Google Spreadsheet du choix des matières.<br>
+                        Ensuite, on supprime les matières ou l'élève n'a pas renseigné de croix (x/X).<br>
+                    </p>
+                    <div class="button-container" data-loader-id="loader-personalize">
+                        <input type="submit" value="Choisir son fichier dans la liste" class="btn-with-loader event-list-btn" onclick="submitForm('/eleves')">
+                        <div class="loader" id="loader-personalize"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
     <script>
-        function submitForm() {
+        function submitForm(destination) {
             if (document.getElementById("sheet_id").value === "" || document.getElementById("sheet_name").value === "") {
-                window.location.href = "/annee";
+                window.location.href = destination;
+            }
+            else if (destination === "/annee"){
+                document.getElementById("sheet-info-form").submit();
             }
             else {
-                document.getElementById("sheet-info-form").submit();
+                window.location.href = destination
             }
         }
     </script>
