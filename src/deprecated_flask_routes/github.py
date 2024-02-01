@@ -1,3 +1,6 @@
+from src.api_flask import *
+
+
 @app.route("/github")
 def get_github_file_list():
     gh = GithubFilesManager()

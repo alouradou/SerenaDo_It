@@ -1,8 +1,6 @@
-import json
 import os
 from datetime import datetime
 
-import requests
 from flask import Flask, request, render_template, url_for, send_file, abort
 from flask_caching import Cache
 
@@ -11,7 +9,6 @@ from werkzeug.utils import secure_filename
 from src.data_manager import DataManager, compute_timetable_header, StudentDataManager
 from src.calendar_manager import CalendarManager
 from src.exel_manager import ExcelManager
-from src.github_files_manager import GithubFilesManager
 from src.parse_excel_line import ParseExcelLine
 import src.personalize_timetable as personalize_timetable
 
@@ -143,35 +140,6 @@ def get_student_calendar_from_list():
                            path="/ics?path=" + path,
                            host=request.host_url.split("//")[1][:-1],
                            displayed_name=f"{student['prénom']} {student['nom']}")
-
-
-@app.route("/year-calendar")
-def get_calendar():
-    # Call course list route first to cache the course list
-    course_list = cache.get('course_list')
-    if not course_list:
-        get_event_list()
-        course_list = cache.get('course_list')
-    cal = CalendarManager(course_list)
-    cal.browse_course_list()
-
-    date = datetime.now()
-    path = f'year-calendar.ics'
-    cal.save_calendar(os.path.join(app.config['UPLOAD_FOLDER'], path))
-
-    return render_template('calendar.html', path="/ics?path=" + path)
-
-
-@app.route("/my-calendar")
-def get_personalization_menu():
-    course_list = cache.get('course_list')
-    if not course_list:
-        get_event_list()
-        course_list = cache.get('course_list')
-    desc = [course_list[i].description for i in range(len(course_list))]
-    print(desc)
-    unique_desc = list(set(desc))
-    return render_template('personalize.html', selectable_courses=unique_desc, course_list=course_list)
 
 
 @app.route('/annee/source-excel', methods=['POST'])
