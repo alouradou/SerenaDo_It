@@ -111,7 +111,6 @@ def get_student_calendar_from_list():
         "./uploads/tmp_students.xlsx", student_sheet_name)
 
     student = students_df.loc[students_df.index == student_id].iloc[0]
-    print(student)
     custom_path = f"{secure_filename(student['prénom'])}-{secure_filename(student['nom'])}"
     filename = f"./uploads/edt-{custom_path}.xlsx"
 
@@ -135,8 +134,15 @@ def get_student_calendar_from_list():
     path = f'year-calendar-{custom_path}.ics'
     cal.save_calendar(os.path.join(app.config['UPLOAD_FOLDER'], path))
 
+    if cache.get('course_list'):
+        full_calendar_course_list = cache.get('course_list')
+    else:
+        get_event_list()
+        full_calendar_course_list = cache.get('course_list')
+
     return render_template('event-list.html',
                            course_list=course_list,
+                           full_course_list=full_calendar_course_list,
                            path="/ics?path=" + path,
                            host=request.host_url.split("//")[1][:-1],
                            displayed_name=f"{student['prénom']} {student['nom']}")

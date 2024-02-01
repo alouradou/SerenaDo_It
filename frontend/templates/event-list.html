@@ -9,11 +9,13 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <script>
+    console.log(window.innerWidth)
 
       document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'listWeek',  // Utilisez 'timeGridWeek' pour la vue semaine
+          initialView: window.innerWidth > 768 ? 'timeGridWeek' : 'timeGridDay',
+            // Utilisez 'timeGridWeek' pour la vue semaine, listWeek pour la vue liste
           height: 700,  // Hauteur du calendrier
           events: [
             {% for event in course_list %}
@@ -33,7 +35,27 @@
           },
           firstDay: 1,  // Démarre la semaine le lundi
           weekends: false,  // N'affiche pas les week-ends par défaut
+          themeSystem: 'bootstrap',
+        {% if full_course_list %}
+          eventColor: '#3498db'
+        {% else %}
+          eventColor: '#db8f8f'
+        {% endif %}
         });
+        {% if full_course_list %}
+            calendar.addEventSource([
+                {% for event in full_course_list %}
+                {
+                  title: '{{ event.description }}',
+                  location: '{{ event.location }}',
+                  description: '{{ event.organizer }}',
+                  start: '{{ event.start }}',
+                  end: '{{ event.end }}',
+                  color: '#db8f8f'
+                },
+                {% endfor %}
+            ]);
+        {% endif %}
         calendar.render();
       });
 
