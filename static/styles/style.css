@@ -175,7 +175,7 @@ a.year-calendar:hover {
     gap: 10px;
     display: flex;
     justify-content: center;
-    text-align: left;
+    text-align: center;
     margin: 0 auto 20px;
 }
 
@@ -204,8 +204,8 @@ input[type="text"] {
     border: 8px solid #f3f3f3;
     border-top: 8px solid #3498db;
     border-radius: 50%;
-    height: 60%;
-    aspect-ratio: auto 1 / 1;
+    height: 25px;
+    width: 25px;
     animation: spin 1s linear infinite;
     position: absolute;
     top: 0;
