@@ -4,3 +4,8 @@ requests~=2.31.0
 icalendar~=4.0.7
 flask~=2.2.5
 flask_caching
+pip~=23.2.1
+wheel~=0.41.2
+setuptools~=68.2.0
+werkzeug~=3.0.1
+pytz~=2023.3.post1
