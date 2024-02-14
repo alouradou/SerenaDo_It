@@ -36,6 +36,18 @@ ps aux | grep gunicorn
 netstat -tulnp | grep 10410
 ```
 
+Pour arrêter le serveur :
+```bash
+ps aux | grep gunicorn
+kill -9 <gunicorn_pid>
+```
+
+
+Redéployer sur le serveur nginx les fichiers statiques nécessaires (changements de styles, scripts, ajout d'images...) :
+```bash
+rm -r ~/node/static/styles ~/node/static/scripts ~/node/static/images
+cp -r ./static ~/node/
+```
 ## Méthode déconseillée (ancienne)
 
 ```bash
