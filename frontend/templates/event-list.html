@@ -96,7 +96,7 @@
             el.addEventListener('click', (e) => {
                 e.preventDefault();
                 navigator.clipboard.writeText(e.target.href);
-                orignialText = e.target.innerHTML;
+                let orignialText = e.target.innerHTML;
                 e.target.innerHTML = 'Lien copié';
                 setTimeout(() => {
                     e.target.innerHTML = orignialText;
