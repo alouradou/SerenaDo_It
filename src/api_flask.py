@@ -140,10 +140,16 @@ def get_student_calendar_from_list():
         get_event_list()
         full_calendar_course_list = cache.get('course_list')
 
+    custom_full_course_path = f"-{secure_filename(sheet_id)}-{secure_filename(sheet_name)}"
+
+    full_course_path = f'year-calendar{custom_full_course_path}.ics'
+    cal.save_calendar(os.path.join(app.config['UPLOAD_FOLDER'], full_course_path))
+
     return render_template('event-list.html',
                            course_list=course_list,
                            full_course_list=full_calendar_course_list,
                            path="/ics?path=" + path,
+                           full_course_path="/ics?path=" + full_course_path,
                            host=request.host_url.split("//")[1][:-1],
                            displayed_name=f"{student['prénom']} {student['nom']}")
 
