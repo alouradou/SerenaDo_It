@@ -69,13 +69,39 @@
             </div>
             <h1>La liste des cours de l'année ({{ displayed_name.split(".xlsx")[0] }})</h1>
             <div id="calendar-info">
-                <a type="button" href="{{ 'webcal://node.oignon.ovh1.ec-m.fr' + path }}" role="button"  class="btn-with-loader year-calendar">
-                    S'abonner (recommandé)
-                </a>
-                <a href="{{ path }}" class="">Copier ce lien pour ajouter manuellement à votre application favorite</a>
+                <div>
+                    <a type="button" href="{{ path }}" role="button"
+                       class="btn-with-loader year-calendar">
+                        S'abonner (recommandé)
+                    </a>
+                    <a href="{{ path }}" class="copy-link">Copier ce lien pour ajouter manuellement à votre application favorite</a>
+                </div>
+                {% if full_course_list %}
+                    <div>
+                        <a type="button" href="{{ 'webcal://node.oignon.ovh1.ec-m.fr' + 'full_course_path' }}" role="button"
+                           class="btn-with-loader year-calendar red-sub-btn">
+                            S'abonner au calendrier complet
+                        </a>
+                        <a href="{{ 'full_course_path' }}" class="copy-link">Copier ce lien</a>
+                    </div>
+                {% endif %}
             </div>
             <div id='calendar'></div>
         </div>
     </div>
+
+    <script>
+        // Copy script
+        document.querySelectorAll('.copy-link').forEach((el) => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                navigator.clipboard.writeText(e.target.href);
+                e.target.innerHTML = 'Lien copié';
+                setTimeout(() => {
+                    e.target.innerHTML = 'S\'abonner (recommandé)';
+                }, 2000);
+            });
+        });
+    </script>
 </body>
 </html>

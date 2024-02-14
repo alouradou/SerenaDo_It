@@ -155,6 +155,10 @@ a.year-calendar:hover {
     background-color: #2980b9;
 }
 
+a.year-calendar.red-sub-btn {
+    background-color: #db8f8f;
+}
+
 .button-container {
     position: relative;
     margin: 5px 0;
@@ -254,6 +258,13 @@ input[type="text"] {
 .event-list-container label {
     flex-basis: calc(33.33%); /* 3 columns with 20px spacing */
     box-sizing: border-box;
+}
+
+#calendar-info div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 #calendar {
