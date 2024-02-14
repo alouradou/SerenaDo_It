@@ -70,7 +70,7 @@
             <h1>La liste des cours de l'année ({{ displayed_name.split(".xlsx")[0] }})</h1>
             <div id="calendar-info">
                 <div>
-                    <a type="button" href="{{ path }}" role="button"
+                    <a type="button" href="{{ 'webcal://node.oignon.ovh1.ec-m.fr' + path }}" role="button"
                        class="btn-with-loader year-calendar">
                         S'abonner (recommandé)
                     </a>
@@ -96,9 +96,10 @@
             el.addEventListener('click', (e) => {
                 e.preventDefault();
                 navigator.clipboard.writeText(e.target.href);
+                orignialText = e.target.innerHTML;
                 e.target.innerHTML = 'Lien copié';
                 setTimeout(() => {
-                    e.target.innerHTML = 'S\'abonner (recommandé)';
+                    e.target.innerHTML = orignialText;
                 }, 2000);
             });
         });
