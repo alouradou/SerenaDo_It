@@ -1,4 +1,3 @@
-import pytz
 from icalendar import Calendar, Event
 
 
@@ -9,18 +8,9 @@ class CalendarManager:
 
     def create_event(self, start_datetime, end_datetime, summary, location, speaker):
         event = Event()
-
-        utc_timezone = pytz.utc
-        start_datetime_utc = utc_timezone.localize(start_datetime)
-        end_datetime_utc = utc_timezone.localize(end_datetime)
-
-        gmt1_timezone = pytz.timezone('Europe/Paris')
-        start_datetime_gmt1 = start_datetime_utc.astimezone(gmt1_timezone)
-        end_datetime_gmt1 = end_datetime_utc.astimezone(gmt1_timezone)
-
         event.add('summary', summary)
-        event.add('dtstart', start_datetime_gmt1)
-        event.add('dtend', end_datetime_gmt1)
+        event.add('dtstart', start_datetime)
+        event.add('dtend', end_datetime)
         event.add('location', location)
         event.add('description', speaker)
         self.cal.add_component(event)
