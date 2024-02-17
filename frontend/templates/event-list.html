@@ -14,6 +14,16 @@
       document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
+          locale: 'fr',
+          buttonText: {
+            today: 'Aujourd\'hui',
+            month: 'Mois',
+            week: 'Semaine',
+            day: 'Jour',
+            list: 'Liste'
+          },
+          titleFormat: { year: 'numeric', month: 'long', day: 'numeric' },
+          allDayText: 'Jour',
           initialView: window.innerWidth > 768 ? 'timeGridWeek' : 'timeGridDay',
             // Utilisez 'timeGridWeek' pour la vue semaine, listWeek pour la vue liste
           height: 700,  // Hauteur du calendrier
