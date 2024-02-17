@@ -17,7 +17,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: 3.9
 
     - name: Install dependencies
       run: |
@@ -44,11 +44,14 @@ jobs:
         port: ${{ secrets.SERVER_PORT }}
         script: |
           cd serenadoit
+          python -m venv serenadoit .
+          source serenadoit/bin/activate
+          pip install -r requirements.txt
+          pip install gunicorn
           git stash
           git pull origin master
           git stash pop
           source serenadoit/bin/activate
-          pip install gunicorn
           rm -rf ~/node/static/styles/ ~/node/static/scripts/ ~/node/static/images/
           cp -r ./static ~/node/
           gunicorn -w 4 -b 0.0.0.0:10410 run_prod:app --error-logfile logs/error.log --access-logfile logs/access.log -D
