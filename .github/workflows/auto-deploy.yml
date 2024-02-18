@@ -58,7 +58,7 @@ jobs:
 
     - name: Check deployment
       run: |
-        # Ajoutez ici les commandes pour vérifier que le déploiement s'est bien déroulé
+        ps aux | grep "^$USER" | grep '[g]unicorn' || true
 
 
 
