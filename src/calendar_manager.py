@@ -1,4 +1,5 @@
 from icalendar import Calendar, Event
+from pytz import timezone
 
 
 class CalendarManager:
@@ -8,9 +9,12 @@ class CalendarManager:
 
     def create_event(self, start_datetime, end_datetime, summary, location, speaker):
         event = Event()
+
+        paris_tz = timezone('Europe/Paris')
+
         event.add('summary', summary)
-        event.add('dtstart', start_datetime)
-        event.add('dtend', end_datetime)
+        event.add('dtstart', paris_tz.localize(start_datetime))
+        event.add('dtend', paris_tz.localize(end_datetime))
         event.add('location', location)
         event.add('description', speaker)
         self.cal.add_component(event)
