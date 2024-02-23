@@ -12,6 +12,15 @@ def get_location_string(cell_string):
         return cell_string
 
 
+def get_organizer_string(cell_string):
+    cell_string = cell_string.strip()
+    match = re.search(r'^\((.*?)\)$', cell_string)
+    if match:
+        return match.group(1)
+    else:
+        return cell_string
+
+
 class Course:
     def __init__(self):
         self.cell_content = ""
@@ -29,7 +38,6 @@ class Course:
         try:
             self.description = cell_content_parts[0]
             self.location = get_location_string(cell_content_parts[-1])
-            match = re.search(r'\((.*?)\)', cell_content_parts[-2] if len(cell_content_parts) > 1 else "")
-            self.organizer = match.group(1) if match else None
+            self.organizer = get_organizer_string(cell_content_parts[-2]) if len(cell_content_parts) > 1 else ""
         except IndexError:
             self.description = cell_content_parts[0]
