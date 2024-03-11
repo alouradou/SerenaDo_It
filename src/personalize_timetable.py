@@ -28,7 +28,7 @@ courses_aliases = {
     "Equipe performante": ["Equipe performante", "Equipe performante"],
     "lean engineering": ["lean engineering", "lean engineering"],
     "IT et dynamique des organisations / change management": ["IT et dynamique des organisations / change management", "IT & dynamique organisationnelle"],
-    "Monitoring": ["Monitoring"],
+    "Monitoring": ["Monitoring", "Monitoring des SI"],
     "cybersécurité & management des risques": ["cybersécurité & management des risques", "cybersécurité & management des risques", "cybersécu"],
     "AWS / docker": ["AWS / docker", "AWS, docker"],
     "réseaux": ["réseaux"],
