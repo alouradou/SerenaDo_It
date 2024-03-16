@@ -3,43 +3,35 @@
 # https://github.com/FrancoisBrucker/do-it/blob/main/src/promos/2023-2024/Dang-Vu-Duc/mon/temps-1.2/create_timetable.py
 
 import openpyxl
+import sqlite3
 
-courses_aliases = {
-    "common": [
-        "bonjour !", "tc1 : agilité", "lancement projet 3a", "tc1 : système d'information",
-        "tc1 : gestion des sources", "tc1 : service design", "prez &pok", "do_it circus",
-        "langues", "projet 3a", "vacances", "filière métier", "tronc commun 3a",
-        "prez mon 2", "prez pok", "point pok sprint 1", "point pok sprint 2", "prez mon 1", "pok&mon",
-        "cap 1a/3a/conception si", "prez projet", "rencontre w3g", "débrief", "conférence métier", "stage 3a"
-    ],
-    "écosystème digital": ["écosystème digital", "eco-système digital", "Eco-système digital"],
-    "numérique et travail": ["numérique et travail", "numérique & travail"],
-    "low code": ["low code", "no/low code"],
-    "OPS / Unix": ["OPS / Unix", "ops"],
-    "UX design": ["UX design", "UX design et expression besoin"],
-    "principe théorique de la gestion de projet": ["principe théorique de la gestion de projet", "fondamentaux gestion de projet"],
-    "Stratégie d'entreprise & SI": ["Stratégie d'entreprise & SI", "Stratégie & SI", "stratégje & si"],
-    "Architecture et gouvernance du SI": ["Architecture et gouvernance du SI", "Architecture SI", "architecture si", "Architecture des SI"],
-    "conception des SI": ["conception des SI", "conception SI"],
-    "développement web from 0 to hero": ["développement web from 0 to hero", "web 0 to hero"],
-    "java / gradle": ["java / gradle", "java/ gradle"],
-    "bonnes pratiques": ["bonnes pratiques", "Structuration d'un projet Info", "Programmation par les tests"],
-    "UI- parcours utilisateur": ["UI- parcours utilisateur", "User interface"],
-    "Equipe performante": ["Equipe performante", "Equipe performante"],
-    "lean engineering": ["lean engineering", "lean engineering"],
-    "IT et dynamique des organisations / change management": ["IT et dynamique des organisations / change management", "IT & dynamique organisationnelle"],
-    "Monitoring": ["Monitoring", "Monitoring des SI"],
-    "cybersécurité & management des risques": ["cybersécurité & management des risques", "cybersécurité & management des risques", "cybersécu"],
-    "AWS / docker": ["AWS / docker", "AWS, docker"],
-    "réseaux": ["réseaux"],
-    "structure de données": ["structure de données", "structures de données"],
-    "Project management office GP avancée": ["Project management office GP avancée", "Gestion de projet avancé"],
-    "UI avancée - théorie & testing": ["UI avancée - théorie & testing", "User interface avancé"],
-    "analyse comportementale": ["analyse comportementale", "people analytics"]
-}
+
+def fetch_courses_aliases():
+    conn = sqlite3.connect('../uploads/serenadoit.db')
+    cursor = conn.cursor()
+
+    courses_aliases = {}
+
+    # Récupération des données de la base de données
+    try:
+        cursor.execute("SELECT course_name, alias FROM courses")
+        rows = cursor.fetchall()
+        for row in rows:
+            category, alias = row
+            if category in courses_aliases:
+                courses_aliases[category].append(alias)
+            else:
+                courses_aliases[category] = [alias]
+    except sqlite3.Error as e:
+        print("Erreur lors de la récupération des données depuis la base de données :", e)
+    finally:
+        conn.close()
+
+    return courses_aliases
 
 
 def detect_matching(cell, deleted_courses):
+    courses_aliases = fetch_courses_aliases()
     flat_list = [alias.lower() for key in deleted_courses for alias in courses_aliases.get(key, [])]
     if cell.value is None:
         return False
