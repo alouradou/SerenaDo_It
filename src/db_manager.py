@@ -27,7 +27,7 @@ courses_aliases = {
     "lean engineering": ["lean engineering", "lean engineering"],
     "IT et dynamique des organisations / change management": ["IT et dynamique des organisations / change management",
                                                               "IT & dynamique organisationnelle"],
-    "Monitoring": ["Monitoring"],
+    "Monitoring": ["Monitoring", "Monitoring des SI"],
     "cybersécurité & management des risques": ["cybersécurité & management des risques",
                                                "cybersécurité & management des risques", "cybersécu"],
     "AWS / docker": ["AWS / docker", "AWS, docker"],
@@ -45,13 +45,24 @@ def init_database():
     # Affihcer les tables
     cursor = conn.cursor()
 
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='courses'")
+    table_exists = cursor.fetchone()
+
+    # Si la table existe déjà, la supprimer
+    if table_exists:
+        try:
+            cursor.execute("DROP TABLE courses")
+            conn.commit()
+        except sqlite3.Error as e:
+            print("Erreur lors de la suppression de la table :", e)
+
     # Création de la table pour stocker les correspondances
     try:
         cursor.execute('''CREATE TABLE courses (
-                            id INTEGER PRIMARY KEY,
-                            course_name TEXT,
-                            alias TEXT
-                        )''')
+                                id INTEGER PRIMARY KEY,
+                                course_name TEXT,
+                                alias TEXT
+                            )''')
         conn.commit()
     except sqlite3.Error as e:
         print("Erreur lors de la création de la table :", e)
