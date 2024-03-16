@@ -16,24 +16,131 @@
             </div>
             <h1>Administration de SérénaDo_It</h1>
             <h2>Liste des cours associés à leur nom dans le sheet élève</h2>
-            {% for category, courses in categories.items() %}
-                <h3>{{ category }}</h3>
-                <ul>
-                    {% for course in courses %}
-                        <li>{{ course }}</li>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cours (sheet élève)</th>
+                        <th>Dénominations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category, courses in categories.items() %}
+                        <tr>
+                            <td>{{ category }}</td>
+                            <td>
+                                {% for course in courses %}
+                                    <span class="denomination-item">{{ course }}</span>
+                                {% endfor %}
+                                <span class="plus-btn">+</span>
+                            </td>
+                        </tr>
                     {% endfor %}
-                </ul>
-            {% endfor %}
+                    <tr>
+                        <td><span class="plus-btn">+</span></td>
+                        <td><span class="plus-btn">+</span></td>
+                    </tr>
+                </tbody>
+            </table>
 
-            <h2>Ajouter un nouveau cours</h2>
-            <form action="/add_course" method="post">
-                <label for="category">Catégorie :</label>
-                <input type="text" id="category" name="category"><br><br>
-                <label for="name">Nom du cours :</label>
-                <input type="text" id="name" name="name"><br><br>
-                <input type="submit" value="Ajouter">
-            </form>
+
+{#            <h2>Ajouter un nouveau cours</h2>#}
+{#            <form action="/add_course" method="post">#}
+{#                <label for="category">Catégorie :</label>#}
+{#                <input type="text" id="category" name="category"><br><br>#}
+{#                <label for="name">Nom du cours :</label>#}
+{#                <input type="text" id="name" name="name"><br><br>#}
+{#                <input type="submit" value="Ajouter">#}
+{#            </form>#}
         </div>
     </div>
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>Voulez-vous supprimer ce cours ?</p>
+        <button id="confirmDelete">Supprimer</button>
+        <button id="cancelDelete">Annuler</button>
+      </div>
+    </div>
+    <script>
+        // Récupérer le modal
+        let modal = document.getElementById("myModal");
+
+        // Récupérer les éléments de fermeture du modal
+        let span = document.getElementsByClassName("close")[0];
+
+        // Récupérer les éléments pour confirmer ou annuler la suppression
+        let confirmDeleteBtn = document.getElementById("confirmDelete");
+        let cancelDeleteBtn = document.getElementById("cancelDelete");
+
+        // Récupérer tous les éléments .denomination-item et .plus-btn
+        let coursesElements = document.querySelectorAll(".denomination-item");
+        let plusBtns = document.querySelectorAll(".plus-btn");
+
+        let course = ""
+        let denomination = ""
+
+        // Fonction pour afficher le modal et gérer la suppression
+        function openModal(event) {
+            console.log(event.target.parentElement.parentElement.children[0].innerText);
+            course = event.target.parentElement.parentElement.children[0].innerText;
+            if (event.target.classList.contains("plus-btn")) {
+                denomination = "";
+                document.getElementById("confirmDelete").innerText = "Ajouter";
+            }
+            else {
+                denomination = event.target.innerText;
+                document.getElementById("confirmDelete").innerText = "Supprimer";
+                console.log(denomination)
+            }
+            modal.style.display = "block";
+        }
+
+        // Fonction pour fermer le modal
+        function closeModal() {
+          modal.style.display = "none";
+        }
+
+        // Ajouter un écouteur d'événements à chaque élément .denomination-item
+        coursesElements.forEach(function(course) {
+          course.addEventListener("click", openModal);
+        });
+
+        // Ajouter un écouteur d'événements à chaque élément .plus-btn
+        plusBtns.forEach(function(btn) {
+          btn.addEventListener("click", openModal);
+        });
+
+        // Ajouter un écouteur d'événement à l'élément de fermeture du modal
+        span.addEventListener("click", closeModal);
+
+        // Ajouter un écouteur d'événement pour annuler la suppression
+        cancelDeleteBtn.addEventListener("click", closeModal);
+
+        // Fonction pour confirmer la suppression (à modifier selon vos besoins)
+        confirmDeleteBtn.addEventListener("click", function() {
+            var data = new FormData();
+            data.append('course', course);
+            data.append('denomination', denomination);
+
+            // Envoyer la requête POST
+            fetch('/admin/delete_course', {
+                method: 'POST',
+                body: data
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log("Cours supprimé !");
+                    closeModal();
+                    location.reload(); // Recharger la page pour refléter les changements
+                } else {
+                    console.error("Erreur lors de la suppression du cours :", response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error("Erreur lors de la suppression du cours :", error);
+            });
+        });
+
+    </script>
 </body>
 </html>
