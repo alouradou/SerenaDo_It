@@ -1,0 +1,39 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SérénaDo_It</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="back-button-container">
+                <a href="/" class="back-button">Retour</a>
+            </div>
+            <h1>Administration de SérénaDo_It</h1>
+            <h2>Liste des cours associés à leur nom dans le sheet élève</h2>
+            {% for category, courses in categories.items() %}
+                <h3>{{ category }}</h3>
+                <ul>
+                    {% for course in courses %}
+                        <li>{{ course }}</li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+
+            <h2>Ajouter un nouveau cours</h2>
+            <form action="/add_course" method="post">
+                <label for="category">Catégorie :</label>
+                <input type="text" id="category" name="category"><br><br>
+                <label for="name">Nom du cours :</label>
+                <input type="text" id="name" name="name"><br><br>
+                <input type="submit" value="Ajouter">
+            </form>
+        </div>
+    </div>
+</body>
+</html>
