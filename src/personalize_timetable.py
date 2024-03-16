@@ -7,7 +7,7 @@ import sqlite3
 
 
 def fetch_courses_aliases():
-    conn = sqlite3.connect('../uploads/serenadoit.db')
+    conn = sqlite3.connect('./uploads/serenadoit.db')
     cursor = conn.cursor()
 
     courses_aliases = {}

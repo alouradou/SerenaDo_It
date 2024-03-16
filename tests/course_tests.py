@@ -37,6 +37,8 @@ Intervenant
         self.assertEqual(course.organizer, "Intervenant")
 
     def test_detect_matching(self):
+        import os
+        os.chdir("..")
         class Cell:
             def __init__(self, value: str):
                 self.value = value
