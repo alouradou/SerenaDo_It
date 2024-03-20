@@ -30,7 +30,7 @@ courses_aliases = {
     "IT et dynamique des organisations / change management": ["IT et dynamique des organisations / change management",
                                                               "IT & dynamique organisationnelle"],
     "Monitoring": ["Monitoring", "Monitoring des SI"],
-    "cybersécurité & management des risques": ["cybersécurité & management des risques",
+    "cybersécurité & management des risques": ["cybersécurité & management des risques", "Cybersécurité",
                                                "cybersécurité & management des risques", "cybersécu"],
     "AWS / docker": ["AWS / docker", "AWS, docker"],
     "réseaux": ["réseaux"],
