@@ -26,6 +26,7 @@ def fetch_courses():
 
     return categories
 
+
 def fetch_unknown_courses():
     conn = sqlite3.connect('./uploads/serenadoit.db')
     cursor = conn.cursor()
@@ -35,6 +36,7 @@ def fetch_unknown_courses():
         cursor.execute("SELECT course_name FROM unknown_courses")
         rows = cursor.fetchall()
         for row in rows:
+            print(row[0])
             unknown_courses.append(row[0])
     except sqlite3.Error as e:
         print("Erreur lors de la récupération des données depuis la base de données :", e)

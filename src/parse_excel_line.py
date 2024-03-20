@@ -63,13 +63,15 @@ def add_unknown_course(course):
     # check if course in courses aliases
     cursor.execute("SELECT course_name FROM courses WHERE course_name LIKE ? OR alias LIKE ?",
                    (course.description, course.description))
-    if cursor.fetchone():
+    if cursor.fetchone() or course.description == "None":
         return
 
     try:
         cursor.execute("INSERT INTO unknown_courses (course_name, additional_info) VALUES (?, ?)",
                        (course.description, str(course)))
     except sqlite3.Error as e:
+        if e == "UNIQUE constraint failed: unknown_courses.course_name":
+            return
         print("Erreur lors de l'insertion des données dans la base de données :", e)
     finally:
         conn.commit()

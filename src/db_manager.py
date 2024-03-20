@@ -6,7 +6,9 @@ courses_aliases = {
         "tc1 : gestion des sources", "tc1 : service design", "prez &pok", "do_it circus",
         "langues", "projet 3a", "vacances", "filière métier", "tronc commun 3a",
         "prez mon 2", "prez pok", "point pok sprint 1", "point pok sprint 2", "prez mon 1", "pok&mon",
-        "cap 1a/3a/conception si", "prez projet", "rencontre w3g", "débrief", "conférence métier", "stage 3A"
+        "cap 1a/3a/conception si", "prez projet", "rencontre w3g", "débrief", "conférence métier", "stage 3A",
+        "CAP 1A/3A / Conception SI", "TC1 : Service Design (Démarrage à 8h45)", 'conf  "product manager"',
+        "prez MON 1 (13h30-15h30)", "rentrée"
     ],
     "écosystème digital": ["écosystème digital", "eco-système digital", "Eco-système digital"],
     "numérique et travail": ["numérique et travail", "numérique & travail"],
@@ -88,7 +90,7 @@ def init_database():
         for alias in aliases:
             cursor.execute("INSERT INTO courses (course_name, alias) VALUES (?, ?)", (course_name, alias))
 
-    cursor.execute("INSERT INTO unknown_courses (course_name) VALUES (?)", ("unknown_test",))
+    # cursor.execute("INSERT INTO unknown_courses (course_name) VALUES (?)", ("unknown_test",))
 
     # Commit et fermeture de la connexion
     conn.commit()
