@@ -26,13 +26,31 @@ def fetch_courses():
 
     return categories
 
+def fetch_unknown_courses():
+    conn = sqlite3.connect('./uploads/serenadoit.db')
+    cursor = conn.cursor()
+
+    unknown_courses = []
+    try:
+        cursor.execute("SELECT course_name FROM unknown_courses")
+        rows = cursor.fetchall()
+        for row in rows:
+            unknown_courses.append(row[0])
+    except sqlite3.Error as e:
+        print("Erreur lors de la récupération des données depuis la base de données :", e)
+    finally:
+        conn.close()
+
+    return unknown_courses
+
 
 @app.route("/admin")
 def admin_view():
     categories = fetch_courses()
-    print(categories)
+    unknown_courses = fetch_unknown_courses()
     return render_template('admin.html',
-                           categories=categories)
+                           categories=categories,
+                           unknown_courses=unknown_courses)
 
 
 @app.route("/admin/delete_course", methods=['POST'])
@@ -68,7 +86,10 @@ def add_course():
         try:
             cursor.execute("INSERT INTO courses (course_name, alias) VALUES (?, ?)", (course, denomination))
             conn.commit()
-            print("Nouveau cours ajouté avec succès !")
+            print("Nouveau cours ajouté avec succès !", course, denomination)
+            cursor.execute("DELETE FROM unknown_courses WHERE course_name = ?", (denomination,))
+            conn.commit()
+            print("Cours supprimé de la liste des cours inconnus avec succès !", denomination)
         except sqlite3.Error as e:
             print("Erreur lors de l'ajout du nouveau cours dans la base de données :", e)
         finally:

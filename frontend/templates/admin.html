@@ -15,30 +15,32 @@
                 <a href="/" class="back-button">Retour</a>
             </div>
             <h1>Administration de SérénaDo_It</h1>
-            <div>
-            <h2>Cours inconnus</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Cours</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for course in unknown_courses %}
+            {% if unknown_courses %}
+                <h2>Cours inconnus</h2>
+                <table>
+                    <thead>
                         <tr>
-                            <td>{{ course }}</td>
-                            <td>
-                                <button class="delete-btn">Supprimer</button>
-                            </td>
+                            <th>Cours inconnus</th>
+                            <th>Actions</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
+                    </thead>
+                    <tbody>
+                        {% for course in unknown_courses %}
+                            <tr>
+                                <td>{{ course }}</td>
+                                <td>
+                                    <button class="attribution-btn">Attribuer</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
             <h2>Liste des cours associés à leur nom dans le sheet élève</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Cours (sheet élève)</th>
+                        <th>Cours (nom sheet élève)</th>
                         <th>Dénominations</th>
                     </tr>
                 </thead>
@@ -60,16 +62,6 @@
                     </tr>
                 </tbody>
             </table>
-
-
-{#            <h2>Ajouter un nouveau cours</h2>#}
-{#            <form action="/add_course" method="post">#}
-{#                <label for="category">Catégorie :</label>#}
-{#                <input type="text" id="category" name="category"><br><br>#}
-{#                <label for="name">Nom du cours :</label>#}
-{#                <input type="text" id="name" name="name"><br><br>#}
-{#                <input type="submit" value="Ajouter">#}
-{#            </form>#}
         </div>
     </div>
     <div id="myModal" class="modal">
@@ -77,11 +69,15 @@
         <span class="close">&times;</span>
         <p id="modalText"></p>
         <div>
-            <label for="courseInput">Cours :</label>
-            <input type="text" id="courseInput" name="course">
+            <label for="courseInput">Cours (nom sheet élève) :</label>
+            <select id="courseInput">
+                {% for category, _ in categories.items() %}
+                    <option value="{{ category }}">{{ category }}</option>
+                {% endfor %}
+            </select>
         </div>
         <div>
-            <label for="denominationInput">Dénomination :</label>
+            <label for="denominationInput">Dénomination à modifier :</label>
             <input type="text" id="denominationInput" name="denomination">
         </div>
         <button id="confirmSend">Supprimer</button>
@@ -102,13 +98,14 @@
         // Récupérer tous les éléments .denomination-item et .plus-btn
         let coursesElements = document.querySelectorAll(".denomination-item");
         let plusBtns = document.querySelectorAll(".plus-btn");
+        let attributionBtns = document.querySelectorAll(".attribution-btn");
 
         let course = ""
         let denomination = ""
 
         // Fonction pour afficher le modal et gérer la suppression
         function openModal(event) {
-            console.log(event.target.parentElement.parentElement.children[0].innerText);
+            console.log(event)
             course = event.target.parentElement.parentElement.children[0].innerText;
             if (event.target.classList.contains("plus-btn")) {
                 denomination = "";
@@ -122,6 +119,13 @@
                 }
                 document.getElementById("denominationInput").value = "";
                 document.getElementById("denominationInput").readOnly = false;
+            }
+            else if (event.target.classList.contains("attribution-btn")) {
+                denomination = event.target.parentElement.parentElement.children[0].innerText;
+                document.getElementById("confirmSend").innerText = "Ajouter";
+                document.getElementById("modalText").innerText = "Attribuer le cours "+denomination;
+                document.getElementById("denominationInput").value = denomination;
+                document.getElementById("denominationInput").readOnly = true;
             }
             else {
                 denomination = event.target.innerText;
@@ -147,6 +151,10 @@
 
         // Ajouter un écouteur d'événements à chaque élément .plus-btn
         plusBtns.forEach(function(btn) {
+          btn.addEventListener("click", openModal);
+        });
+
+        attributionBtns.forEach(function(btn) {
           btn.addEventListener("click", openModal);
         });
 
