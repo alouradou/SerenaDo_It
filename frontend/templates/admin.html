@@ -15,6 +15,25 @@
                 <a href="/" class="back-button">Retour</a>
             </div>
             <h1>Administration de SérénaDo_It</h1>
+            <div>
+            <h2>Cours inconnus</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cours</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in unknown_courses %}
+                        <tr>
+                            <td>{{ course }}</td>
+                            <td>
+                                <button class="delete-btn">Supprimer</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
             <h2>Liste des cours associés à leur nom dans le sheet élève</h2>
             <table>
                 <thead>

@@ -56,12 +56,27 @@ def init_database():
         except sqlite3.Error as e:
             print("Erreur lors de la suppression de la table :", e)
 
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='unknown_courses'")
+    table_exists = cursor.fetchone()
+
+    # Si la table existe déjà, la supprimer
+    if table_exists:
+        try:
+            cursor.execute("DROP TABLE unknown_courses")
+            conn.commit()
+        except sqlite3.Error as e:
+            print("Erreur lors de la suppression de la table :", e)
+
     # Création de la table pour stocker les correspondances
     try:
         cursor.execute('''CREATE TABLE courses (
                                 id INTEGER PRIMARY KEY,
                                 course_name TEXT,
                                 alias TEXT
+                            )''')
+        cursor.execute('''CREATE TABLE unknown_courses (
+                                id INTEGER PRIMARY KEY,
+                                course_name TEXT
                             )''')
         conn.commit()
     except sqlite3.Error as e:
@@ -71,6 +86,8 @@ def init_database():
     for course_name, aliases in courses_aliases.items():
         for alias in aliases:
             cursor.execute("INSERT INTO courses (course_name, alias) VALUES (?, ?)", (course_name, alias))
+
+    cursor.execute("INSERT INTO unknown_courses (course_name) VALUES (?)", ("unknown_test",))
 
     # Commit et fermeture de la connexion
     conn.commit()
