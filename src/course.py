@@ -36,7 +36,7 @@ class Course:
     def get_description(self):
         cell_content_parts = str(self.cell_content).split("\n")
         try:
-            self.description = cell_content_parts[0]
+            self.description = cell_content_parts[0].strip()
             self.location = get_location_string(cell_content_parts[-1])
             self.organizer = get_organizer_string(cell_content_parts[-2]) if len(cell_content_parts) > 1 else ""
         except IndexError:

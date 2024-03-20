@@ -6,7 +6,7 @@ courses_aliases = {
         "tc1 : gestion des sources", "tc1 : service design", "prez &pok", "do_it circus",
         "langues", "projet 3a", "vacances", "filière métier", "tronc commun 3a",
         "prez mon 2", "prez pok", "point pok sprint 1", "point pok sprint 2", "prez mon 1", "pok&mon",
-        "cap 1a/3a/conception si", "prez projet", "rencontre w3g", "débrief", "conférence métier", "stage 3a"
+        "cap 1a/3a/conception si", "prez projet", "rencontre w3g", "débrief", "conférence métier", "stage 3A"
     ],
     "écosystème digital": ["écosystème digital", "eco-système digital", "Eco-système digital"],
     "numérique et travail": ["numérique et travail", "numérique & travail"],
@@ -76,7 +76,8 @@ def init_database():
                             )''')
         cursor.execute('''CREATE TABLE unknown_courses (
                                 id INTEGER PRIMARY KEY,
-                                course_name TEXT
+                                course_name TEXT UNIQUE,
+                                additional_info TEXT
                             )''')
         conn.commit()
     except sqlite3.Error as e:

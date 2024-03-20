@@ -1,3 +1,4 @@
+import sqlite3
 from datetime import datetime, timedelta
 import pandas as pd
 
@@ -55,6 +56,26 @@ def is_course_continuation(previous, current):
         return False
 
 
+def add_unknown_course(course):
+    conn = sqlite3.connect('./uploads/serenadoit.db')
+    cursor = conn.cursor()
+
+    # check if course in courses aliases
+    cursor.execute("SELECT course_name FROM courses WHERE course_name LIKE ? OR alias LIKE ?",
+                   (course.description, course.description))
+    if cursor.fetchone():
+        return
+
+    try:
+        cursor.execute("INSERT INTO unknown_courses (course_name, additional_info) VALUES (?, ?)",
+                       (course.description, str(course)))
+    except sqlite3.Error as e:
+        print("Erreur lors de l'insertion des données dans la base de données :", e)
+    finally:
+        conn.commit()
+        conn.close()
+
+
 class ParseExcelLine:
     def __init__(self, df: pd.DataFrame, date: datetime):
         line = select_week_from_date(df, date)
@@ -95,6 +116,11 @@ class ParseExcelLine:
                     self.course_list.append(self.previous_course)
 
                 self.previous_course = self.current_course
+
+                try:
+                    add_unknown_course(self.current_course)
+                except Exception as e:
+                    pass
 
             except IndexError:
                 continue
