@@ -56,8 +56,16 @@
     <div id="myModal" class="modal">
       <div class="modal-content">
         <span class="close">&times;</span>
-        <p>Voulez-vous supprimer ce cours ?</p>
-        <button id="confirmDelete">Supprimer</button>
+        <p id="modalText"></p>
+        <div>
+            <label for="courseInput">Cours :</label>
+            <input type="text" id="courseInput" name="course">
+        </div>
+        <div>
+            <label for="denominationInput">Dénomination :</label>
+            <input type="text" id="denominationInput" name="denomination">
+        </div>
+        <button id="confirmSend">Supprimer</button>
         <button id="cancelDelete">Annuler</button>
       </div>
     </div>
@@ -69,7 +77,7 @@
         let span = document.getElementsByClassName("close")[0];
 
         // Récupérer les éléments pour confirmer ou annuler la suppression
-        let confirmDeleteBtn = document.getElementById("confirmDelete");
+        let confirmBtn = document.getElementById("confirmSend");
         let cancelDeleteBtn = document.getElementById("cancelDelete");
 
         // Récupérer tous les éléments .denomination-item et .plus-btn
@@ -85,12 +93,25 @@
             course = event.target.parentElement.parentElement.children[0].innerText;
             if (event.target.classList.contains("plus-btn")) {
                 denomination = "";
-                document.getElementById("confirmDelete").innerText = "Ajouter";
+                document.getElementById("confirmSend").innerText = "Ajouter";
+                document.getElementById("modalText").innerText = "Ajouter un nouveau cours";
+                document.getElementById("courseInput").value = course;
+                document.getElementById("courseInput").readOnly = true;
+                if (course === "+") {
+                    document.getElementById("courseInput").value = "";
+                    document.getElementById("courseInput").readOnly = false;
+                }
+                document.getElementById("denominationInput").value = "";
+                document.getElementById("denominationInput").readOnly = false;
             }
             else {
                 denomination = event.target.innerText;
-                document.getElementById("confirmDelete").innerText = "Supprimer";
-                console.log(denomination)
+                document.getElementById("confirmSend").innerText = "Supprimer";
+                document.getElementById("modalText").innerText = "Voulez-vous supprimer ce cours ?";
+                document.getElementById("courseInput").value = course;
+                document.getElementById("courseInput").readOnly = true;
+                document.getElementById("denominationInput").value = denomination;
+                document.getElementById("denominationInput").readOnly = true;
             }
             modal.style.display = "block";
         }
@@ -117,27 +138,29 @@
         cancelDeleteBtn.addEventListener("click", closeModal);
 
         // Fonction pour confirmer la suppression (à modifier selon vos besoins)
-        confirmDeleteBtn.addEventListener("click", function() {
+        confirmBtn.addEventListener("click", function() {
             var data = new FormData();
+            course = document.getElementById("courseInput").value;
+            denomination = document.getElementById("denominationInput").value;
             data.append('course', course);
             data.append('denomination', denomination);
 
             // Envoyer la requête POST
-            fetch('/admin/delete_course', {
+            fetch('/admin/' + (confirmBtn.innerText === "Ajouter" ? "add_course" : "delete_course"), {
                 method: 'POST',
                 body: data
             })
             .then(response => {
                 if (response.ok) {
-                    console.log("Cours supprimé !");
+                    console.log(confirmBtn.innerText === "Ajouter" ? "Nouveau cours ajouté !" : "Cours supprimé !");
                     closeModal();
                     location.reload(); // Recharger la page pour refléter les changements
                 } else {
-                    console.error("Erreur lors de la suppression du cours :", response.statusText);
+                    console.error("Erreur :", response.statusText);
                 }
             })
             .catch(error => {
-                console.error("Erreur lors de la suppression du cours :", error);
+                console.error("Erreur :", error);
             });
         });
 
