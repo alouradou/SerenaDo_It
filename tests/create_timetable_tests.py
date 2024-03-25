@@ -1,14 +1,28 @@
 import os
 import unittest
 import openpyxl
-from openpyxl.styles import Alignment, Font, Border, Side
+from sqlalchemy import text, create_engine
+from datetime import datetime, timedelta
 
 from src.create_timetable import CreateTimetable
 from src.data_manager import DataManager
 from src.personalize_timetable import PersonalizeTimetable
 
+os.chdir('..')
+
+
+def test_db_connection(engine):
+    try:
+        with engine.connect():
+            print("Connection to db successful")
+            return True
+    except Exception as e:
+        print("Connection to db failed: ", e)
+        return False
+
 
 class TestCreateTimetable(unittest.TestCase):
+
     def test_fetch_google_sheet(self):
         planning_data_manager = DataManager("",
                                             sheet_name="année",
@@ -27,12 +41,48 @@ class TestCreateTimetable(unittest.TestCase):
         with open("../uploads/edt Do_It.23-24.xlsx", "rb") as f:
             self.assertTrue("année" in openpyxl.load_workbook(f, data_only=True).sheetnames)
 
+    def test_cache_google_sheet_db(self):
+        db_engine = create_engine('sqlite:///uploads/serenadoit.db')
+        self.assertTrue(test_db_connection(db_engine))
+
+        sheet_id = ""
+        student_sheet_id = ""
+
+        with db_engine.connect() as conn:
+            fetch_dates = conn.execute(text("SELECT DISTINCT fetch_date FROM table2503 ORDER BY fetch_date")).fetchall()
+            last_fetch = fetch_dates[-1][0]
+            last_fetch = datetime.strptime(last_fetch, "%Y-%m-%d %H:%M:%S.%f")
+            print(last_fetch)
+
+        if last_fetch < datetime.now() - timedelta(minutes=1):
+            print("Fetching new data")
+            planning_data_manager = DataManager(sheet_id,
+                                                sheet_name="année",
+                                                saved_workbook_path="./uploads/edt Do_It.23-24.xlsx")
+            choices_data_manager = DataManager(student_sheet_id,
+                                               sheet_name="effectif",
+                                               saved_workbook_path="./uploads/choix.xlsx")
+            planning_data_manager.load_workbook()
+            choices_data_manager.load_workbook()
+            df = planning_data_manager.excel_to_dataframe('année')
+            df['fetch_date'] = datetime.now()
+            df['sheet_id'] = sheet_id
+            df['student_sheet_id'] = student_sheet_id
+            df.to_sql('table2503', con=db_engine, if_exists='append', index=False)
+        else:
+            print("Using cached data")
+            with db_engine.connect() as conn:
+                df = conn.execute(text("SELECT * FROM table2503 WHERE fetch_date=:last_fetch"),
+                                  {"last_fetch": last_fetch}).fetchall()
+                print(df)
+
+
     def set_up(self):
         # Créer une instance de CreateTimetable avec des fichiers de test
         self.timetable = CreateTimetable(
-            edt_file_name='../uploads/edt Do_It.23-24.xlsx',
+            edt_file_name='./uploads/edt Do_It.23-24.xlsx',
             edt_sheet_name='année',
-            students_file_name='../static/header_etudiants_do_it.xlsx',
+            students_file_name='./static/header_etudiants_do_it.xlsx',
             students_sheet_name='effectif'
         )
         # Initialiser la feuille 2 avec des données de test
@@ -41,11 +91,11 @@ class TestCreateTimetable(unittest.TestCase):
     def test_create_timetable_automatic(self):
         self.set_up()
         # Appeler la méthode avec l'étudiant de test
-        self.timetable.create_timetable_automatic('Test', 'Test', '../uploads/test_output.xlsx')
+        self.timetable.create_timetable_automatic('Test', 'Test', './uploads/test_output.xlsx')
 
         # Charger la feuille de calcul d'origine et la feuille générée par le test
-        original_workbook = openpyxl.load_workbook('../uploads/edt Do_It.23-24.xlsx')
-        generated_workbook = openpyxl.load_workbook('../uploads/test_output.xlsx')
+        original_workbook = openpyxl.load_workbook('./uploads/edt Do_It.23-24.xlsx')
+        generated_workbook = openpyxl.load_workbook('./uploads/test_output.xlsx')
 
         # Vérifier que le fichier a été créé
         self.assertTrue(generated_workbook)
@@ -65,9 +115,9 @@ class TestCreateTimetable(unittest.TestCase):
 
     def test_personalize_timetable(self):
         self.timetable = PersonalizeTimetable(
-            edt_file_name='../uploads/edt Do_It.23-24.xlsx',
+            edt_file_name='./uploads/edt Do_It.23-24.xlsx',
             edt_sheet_name='année',
-            students_file_name='../uploads/choix.xlsx',
+            students_file_name='./uploads/choix.xlsx',
             students_sheet_name='effectif'
         )
         # Initialiser la feuille 2 avec des données de test
@@ -75,20 +125,20 @@ class TestCreateTimetable(unittest.TestCase):
         self.timetable.choices_sheet.append(['Test', 'Full'] + ['X'] * self.timetable.choices_sheet.max_column)
 
         # Appeler la méthode avec l'étudiant de test et tester si le fichier est créé
-        self.timetable.create_timetable_automatic('Test', 'Full', '../uploads/test_output_full.xlsx')
-        self.timetable.create_timetable_automatic('Test', 'Empty', '../uploads/test_output_empty.xlsx')
-        self.assertTrue(os.path.exists('../uploads/test_output_full.xlsx'))
-        self.assertTrue(os.path.exists('../uploads/test_output_empty.xlsx'))
+        self.timetable.create_timetable_automatic('Test', 'Full', './uploads/test_output_full.xlsx')
+        self.timetable.create_timetable_automatic('Test', 'Empty', './uploads/test_output_empty.xlsx')
+        self.assertTrue(os.path.exists('./uploads/test_output_full.xlsx'))
+        self.assertTrue(os.path.exists('./uploads/test_output_empty.xlsx'))
 
         # Appeler la méthode avec une erreur et assert si l'erreur est relevée
         with self.assertRaises(Exception):
             self.timetable.create_timetable_automatic('unnomparfaitementauhasard',
                                                       'unprenomauhasardaussi',
-                                                      '../uploads/test_output2.xlsx')
+                                                      './uploads/test_output2.xlsx')
 
         # Charger la feuille de calcul d'origine et la feuille générée par le test
-        original_workbook = openpyxl.load_workbook('../uploads/edt Do_It.23-24.xlsx')
-        generated_workbook = openpyxl.load_workbook('../uploads/test_output_full.xlsx')
+        original_workbook = openpyxl.load_workbook('./uploads/edt Do_It.23-24.xlsx')
+        generated_workbook = openpyxl.load_workbook('./uploads/test_output_full.xlsx')
 
         # Vérifier que le fichier a été créé
         self.assertTrue(generated_workbook)
