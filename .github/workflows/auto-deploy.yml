@@ -27,7 +27,7 @@ jobs:
 
     - name: Run database initialization
       run: |
-        cd src
+        cd /home/oignon/node/static/uploads/
         python db_manager.py
 
     - name: Run tests
