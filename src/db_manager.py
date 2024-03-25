@@ -41,9 +41,9 @@ courses_aliases = {
 }
 
 
-def init_database():
+def init_database(path='~/node/static/uploads/serenadoit.db'):
     # Connexion à la base de données SQLite
-    conn = sqlite3.connect('../uploads/serenadoit.db')
+    conn = sqlite3.connect(path)
     # Affihcer les tables
     cursor = conn.cursor()
 
@@ -120,4 +120,4 @@ def detect_matching(cell, deleted_courses):
 
 
 if __name__ == "__main__":
-    init_database()
+    init_database('~/node/static/uploads/serenadoit.db')
