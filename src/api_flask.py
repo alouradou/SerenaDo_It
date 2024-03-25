@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 
 from flask import Flask, request, render_template, url_for, send_file, abort
-from flask_caching import Cache
 
 from werkzeug.utils import secure_filename
 
@@ -12,11 +11,7 @@ from src.exel_manager import ExcelManager
 from src.parse_excel_line import ParseExcelLine
 import src.personalize_timetable as personalize_timetable
 
-cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
-cache_duration = 60 * 60  # in seconds
-
 app = Flask(__name__)
-cache.init_app(app)
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 app.template_folder = os.path.join(current_dir, '../frontend/templates')
@@ -38,8 +33,7 @@ def hello_world():
 
 
 @app.route("/annee", methods=['GET'])
-@cache.cached(timeout=cache_duration, query_string=True)
-def get_event_list():
+def get_event_list(direct=False):
     custom_path = ""
     if request.args.get('sheet_id') and request.args.get('sheet_name'):
         sheet_id = request.args.get('sheet_id')
@@ -48,14 +42,11 @@ def get_event_list():
     else:
         sheet_id = app.config['DEFAULT_SHEET_ID']
         sheet_name = app.config['DEFAULT_SHEET_NAME']
-    df = cache.get(f"df{custom_path}")
-    if df is None:
-        data_manager = DataManager(sheet_id, sheet_name=sheet_name)
 
-        df = data_manager.excel_to_dataframe(sheet_name)
-        df = compute_timetable_header(df)
+    data_manager = DataManager(sheet_id, sheet_name=sheet_name)
 
-        cache.set(f"df{custom_path}", df, timeout=cache_duration)
+    df = data_manager.excel_to_dataframe(sheet_name)
+    df = compute_timetable_header(df)
 
     list_week_start_dates = df["Semaine,du"].iloc[2:].dropna().drop_duplicates()
 
@@ -64,7 +55,9 @@ def get_event_list():
         line_parser = ParseExcelLine(df, week_date)
         line_parser.parse()
         course_list += line_parser.course_list
-    cache.set('course_list', course_list, timeout=cache_duration)
+
+    if direct:
+        return course_list
 
     cal = CalendarManager(course_list)
     cal.browse_course_list()
@@ -137,11 +130,7 @@ def get_student_calendar_from_list():
     path = f'year-calendar-{custom_path}.ics'
     cal.save_calendar(os.path.join(app.config['UPLOAD_FOLDER'], path))
 
-    if cache.get('course_list'):
-        full_calendar_course_list = cache.get('course_list')
-    else:
-        get_event_list()
-        full_calendar_course_list = cache.get('course_list')
+    full_calendar_course_list = get_event_list(direct=True)
 
     custom_full_course_path = f"-{secure_filename(sheet_id)}-{secure_filename(sheet_name)}"
 
