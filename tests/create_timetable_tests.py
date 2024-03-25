@@ -26,55 +26,35 @@ class TestCreateTimetable(unittest.TestCase):
     def test_fetch_google_sheet(self):
         planning_data_manager = DataManager("",
                                             sheet_name="année",
-                                            saved_workbook_path="../uploads/edt Do_It.23-24.xlsx")
+                                            saved_workbook_path="./uploads/edt Do_It.23-24.xlsx")
         choices_data_manager = DataManager("",
                                            sheet_name="effectif",
-                                           saved_workbook_path="../uploads/choix.xlsx")
+                                           saved_workbook_path="./uploads/choix.xlsx")
         planning_data_manager.load_workbook()
         choices_data_manager.load_workbook()
-        self.assertTrue(os.path.exists("../uploads/choix.xlsx"))
-        self.assertTrue(os.path.exists("../uploads/edt Do_It.23-24.xlsx"))
+        self.assertTrue(os.path.exists("./uploads/choix.xlsx"))
+        self.assertTrue(os.path.exists("./uploads/edt Do_It.23-24.xlsx"))
 
-        with open("../uploads/choix.xlsx", "rb") as f:
+        with open("./uploads/choix.xlsx", "rb") as f:
             self.assertTrue("effectif" in openpyxl.load_workbook(f, data_only=True).sheetnames)
 
-        with open("../uploads/edt Do_It.23-24.xlsx", "rb") as f:
+        with open("./uploads/edt Do_It.23-24.xlsx", "rb") as f:
             self.assertTrue("année" in openpyxl.load_workbook(f, data_only=True).sheetnames)
 
     def test_cache_google_sheet_db(self):
         db_engine = create_engine('sqlite:///uploads/serenadoit.db')
         self.assertTrue(test_db_connection(db_engine))
 
-        sheet_id = ""
-        student_sheet_id = ""
-
         with db_engine.connect() as conn:
-            fetch_dates = conn.execute(text("SELECT DISTINCT fetch_date FROM table2503 ORDER BY fetch_date")).fetchall()
+            fetch_dates = conn.execute(text("SELECT DISTINCT fetch_date FROM fetch_dates ORDER BY fetch_date")).fetchall()
             last_fetch = fetch_dates[-1][0]
             last_fetch = datetime.strptime(last_fetch, "%Y-%m-%d %H:%M:%S.%f")
             print(last_fetch)
 
-        if last_fetch < datetime.now() - timedelta(minutes=1):
-            print("Fetching new data")
-            planning_data_manager = DataManager(sheet_id,
-                                                sheet_name="année",
-                                                saved_workbook_path="./uploads/edt Do_It.23-24.xlsx")
-            choices_data_manager = DataManager(student_sheet_id,
-                                               sheet_name="effectif",
-                                               saved_workbook_path="./uploads/choix.xlsx")
-            planning_data_manager.load_workbook()
-            choices_data_manager.load_workbook()
-            df = planning_data_manager.excel_to_dataframe('année')
-            df['fetch_date'] = datetime.now()
-            df['sheet_id'] = sheet_id
-            df['student_sheet_id'] = student_sheet_id
-            df.to_sql('table2503', con=db_engine, if_exists='append', index=False)
-        else:
-            print("Using cached data")
-            with db_engine.connect() as conn:
-                df = conn.execute(text("SELECT * FROM table2503 WHERE fetch_date=:last_fetch"),
-                                  {"last_fetch": last_fetch}).fetchall()
-                print(df)
+        print("Using cached data")
+        with db_engine.connect() as conn:
+            df = conn.execute(text("SELECT * FROM fetch_dates WHERE fetch_date=:last_fetch"),
+                              {"last_fetch": last_fetch}).fetchall()
 
 
     def set_up(self):
