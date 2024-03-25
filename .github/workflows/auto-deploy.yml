@@ -25,17 +25,6 @@ jobs:
         source serenadoit/bin/activate
         pip install -r requirements.txt
 
-    - name: Run database initialization
-      run: |
-        cd /home/oignon/node/static/uploads/
-        python db_manager.py
-
-    - name: Run tests
-      run: |
-        cd tests
-        python -m unittest discover -s . -p 'test_*.py'
-        
-
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
@@ -56,6 +45,29 @@ jobs:
           git stash pop
           rm -rf ~/node/static/styles/ ~/node/static/scripts/ ~/node/static/images/
           cp -r ./static ~/node/
+
+    - name: Initialize database
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_PORT }}
+        script: |
+          cd ~/node/static/uploads/
+          python db_manager.py
+
+    - name: Test python code
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_PORT }}
+        script: |
+          cd serenadoit
+          source serenadoit/bin/activate
+          python -m unittest discover -s tests -p 'test_*.py'
 
     - name: Install dependencies and restart server
       uses: appleboy/ssh-action@master
