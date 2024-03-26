@@ -54,8 +54,8 @@ jobs:
         key: ${{ secrets.SERVER_SSH_KEY }}
         port: ${{ secrets.SERVER_PORT }}
         script: |
-          cd serenadoit
-          python src/db_manager.py
+          cd serenadoit/uploads
+          python ../src/db_manager.py
 
     - name: Test python code
       uses: appleboy/ssh-action@master

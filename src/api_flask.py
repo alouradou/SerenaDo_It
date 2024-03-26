@@ -26,25 +26,19 @@ app.config['DEFAULT_STUDENT_SHEET_NAME'] = "effectif"
 from src.api_admin import fetch_config, fetch_courses, admin_view
 
 
+config = fetch_config()
+if config:
+    print("Configuration found in database")
+    sheet_id, sheet_name, student_sheet_id, student_sheet_name = config
+    app.config['DEFAULT_SHEET_ID'] = sheet_id
+    app.config['DEFAULT_SHEET_NAME'] = sheet_name
+    app.config['DEFAULT_STUDENT_SHEET_ID'] = student_sheet_id
+    app.config['DEFAULT_STUDENT_SHEET_NAME'] = student_sheet_name
+
+
 @app.route("/")
 def hello_world():
-    # Fetch the configuration
-    config = fetch_config()
-    if not config:
-        print("No configuration found in database")
-        return render_template('index.html',
-                               sheet_id=app.config['DEFAULT_SHEET_ID'],
-                               sheet_name=app.config['DEFAULT_SHEET_NAME'],
-                               student_sheet_id=app.config['DEFAULT_STUDENT_SHEET_ID'],
-                               student_sheet_name=app.config['DEFAULT_STUDENT_SHEET_NAME'])
-    else:
-        print("Getting configuration from database")
-        sheet_id, sheet_name, student_sheet_id, student_sheet_name = config
-        return render_template('index.html',
-                               sheet_id=sheet_id,
-                               sheet_name=sheet_name,
-                               student_sheet_id=student_sheet_id,
-                               student_sheet_name=student_sheet_name)
+    return render_template('index.html')
 
 
 @app.route("/annee", methods=['GET'])
