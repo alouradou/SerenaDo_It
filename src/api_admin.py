@@ -6,6 +6,26 @@ from src.api_flask import *
 import sqlite3
 
 
+def fetch_config():
+    conn = sqlite3.connect('./uploads/serenadoit.db')
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT sheet_id, sheet_name, student_sheet_id, student_sheet_name FROM sheets ORDER BY date DESC")
+        rows = cursor.fetchall()
+        if len(rows) > 0:
+            sheet_id, sheet_name, student_sheet_id, student_sheet_name = rows[0]
+            return sheet_id, sheet_name, student_sheet_id, student_sheet_name
+        else:
+            return None
+    except sqlite3.Error as e:
+        print("Erreur lors de la récupération des données depuis la base de données :", e)
+    finally:
+        conn.close()
+
+    return None
+
+
 def fetch_courses():
     conn = sqlite3.connect('./uploads/serenadoit.db')
     cursor = conn.cursor()

@@ -23,13 +23,28 @@ app.config['DEFAULT_SHEET_NAME'] = "année"
 app.config['DEFAULT_STUDENT_SHEET_ID'] = "1KU6nJ8KGYOp4EH21jKKVwzF3vBDa8mDBaHFoaekx1ZU"
 app.config['DEFAULT_STUDENT_SHEET_NAME'] = "effectif"
 
-
-from src.api_admin import fetch_courses, admin_view
+from src.api_admin import fetch_config, fetch_courses, admin_view
 
 
 @app.route("/")
 def hello_world():
-    return render_template('index.html')
+    # Fetch the configuration
+    config = fetch_config()
+    if not config:
+        print("No configuration found in database")
+        return render_template('index.html',
+                               sheet_id=app.config['DEFAULT_SHEET_ID'],
+                               sheet_name=app.config['DEFAULT_SHEET_NAME'],
+                               student_sheet_id=app.config['DEFAULT_STUDENT_SHEET_ID'],
+                               student_sheet_name=app.config['DEFAULT_STUDENT_SHEET_NAME'])
+    else:
+        print("Getting configuration from database")
+        sheet_id, sheet_name, student_sheet_id, student_sheet_name = config
+        return render_template('index.html',
+                               sheet_id=sheet_id,
+                               sheet_name=sheet_name,
+                               student_sheet_id=student_sheet_id,
+                               student_sheet_name=student_sheet_name)
 
 
 @app.route("/annee", methods=['GET'])
@@ -78,7 +93,7 @@ def get_student_list():
     student_sheet_name = app.config['DEFAULT_STUDENT_SHEET_NAME']
 
     student_dm = StudentDataManager(student_sheet_id, student_sheet_name,
-                                    saved_workbook_path="./uploads/tmp_students.xlsx",)
+                                    saved_workbook_path="./uploads/tmp_students.xlsx", )
 
     student_df = student_dm.excel_to_dataframe(student_sheet_name)
 
