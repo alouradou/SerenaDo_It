@@ -18,9 +18,26 @@ source serenadoit/bin/activate
 pip install -r requirements.txt
 ```
 
-### Déploiement sur serveur
+### Configuration
 
-## Méthode recommandée
+Mettre en place la base de données dans `./uploads/serenadoit.db`.
+
+Depuis la racine du projet :
+```bash
+cd ./uploads
+python ../src/db_manager.py
+```
+
+Cela doit créer un fichier `./uploads/serenadoit.db` avec les tables suivantes : 
+- courses
+- unknown_courses
+
+On peut changer le lieu de la db mais il faut s'assurer que le code le supporte.
+Pour cela, exécuter le test associé après avoir exécuté `db_manager.py`.
+
+## Déploiement sur serveur
+
+### Méthode recommandée
 
 Après avoir activé le venv : 
 
@@ -48,7 +65,7 @@ Redéployer sur le serveur nginx les fichiers statiques nécessaires (changement
 rm -r ~/node/static/styles ~/node/static/scripts ~/node/static/images
 cp -r ./static ~/node/
 ```
-## Méthode déconseillée (ancienne)
+### Méthode dépréciée
 
 ```bash
 screen -ls
