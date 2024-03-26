@@ -65,12 +65,20 @@ li span {
 .denomination-item, button {
     border: solid 3px #3498db;
     border-radius: 10px;
+    background-color: #3498db;
     margin: 5px 7px;
     padding: 5px;
     display: inline-flex;
     flex-wrap: wrap;
     position: relative;
     cursor: pointer;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
 }
 
 .denomination-item::after {
@@ -81,6 +89,7 @@ li span {
     font-size: 20px;
     cursor: pointer;
     background: rgba(255, 255, 255, 0.6);
+    color: #3498db;
     backdrop-filter: blur(1px);
     -webkit-backdrop-filter: blur(1px);
     border-radius: 20px;
@@ -89,7 +98,7 @@ li span {
     text-align: center;
 }
 
-.denomination-item:hover::after {
+.denomination-item:hover::after, .alert {
     color: red; /* Change la couleur de la croix en rouge au survol */
 }
 
@@ -228,6 +237,10 @@ a.year-calendar.red-sub-btn {
     justify-content: center;
     text-align: center;
     margin: 0 auto 20px;
+}
+
+#admin-container .form-container {
+   text-align: left;
 }
 
 #sheet-info-form {

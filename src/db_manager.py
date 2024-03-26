@@ -47,24 +47,16 @@ def init_database(path='./serenadoit.db'):
     # Affihcer les tables
     cursor = conn.cursor()
 
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='courses'")
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND "
+                   "(name='courses' OR name='unknown_courses' OR name='sheets')")
     table_exists = cursor.fetchone()
 
     # Si la table existe déjà, la supprimer
     if table_exists:
         try:
             cursor.execute("DROP TABLE courses")
-            conn.commit()
-        except sqlite3.Error as e:
-            print("Erreur lors de la suppression de la table :", e)
-
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='unknown_courses'")
-    table_exists = cursor.fetchone()
-
-    # Si la table existe déjà, la supprimer
-    if table_exists:
-        try:
             cursor.execute("DROP TABLE unknown_courses")
+            cursor.execute("DROP TABLE sheets")
             conn.commit()
         except sqlite3.Error as e:
             print("Erreur lors de la suppression de la table :", e)
@@ -81,6 +73,14 @@ def init_database(path='./serenadoit.db'):
                                 course_name TEXT UNIQUE,
                                 additional_info TEXT
                             )''')
+        cursor.execute('''CREATE TABLE sheets (
+                                        id INTEGER PRIMARY KEY,
+                                        sheet_id TEXT,
+                                        sheet_name TEXT,
+                                        student_sheet_id TEXT,
+                                        student_sheet_name TEXT,
+                                        date TEXT
+                                    )''')
         conn.commit()
     except sqlite3.Error as e:
         print("Erreur lors de la création de la table :", e)
@@ -89,8 +89,6 @@ def init_database(path='./serenadoit.db'):
     for course_name, aliases in courses_aliases.items():
         for alias in aliases:
             cursor.execute("INSERT INTO courses (course_name, alias) VALUES (?, ?)", (course_name, alias))
-
-    # cursor.execute("INSERT INTO unknown_courses (course_name) VALUES (?)", ("unknown_test",))
 
     # Commit et fermeture de la connexion
     conn.commit()

@@ -9,12 +9,31 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="admin-container">
         <div class="card">
             <div class="back-button-container">
                 <a href="/" class="back-button">Retour</a>
             </div>
             <h1>Administration de SérénaDo_It</h1>
+            <h2>Personnaliser le Google Sheet par défaut</h2>
+            <div class="form-container">
+                <form action="/admin/personalize_sheet" method="POST" id="sheet-info-form">
+                    {% if error %}
+                        <div class="alert alert-danger">
+                            Erreur : {{ error }}
+                        </div>
+                    {% endif %}
+                    <label for="sheet_id">Id du Google Sheet</label>
+                    <input type="text" name="sheet_id" id="sheet_id" placeholder="sheet_id" value="{{ config['DEFAULT_SHEET_ID'] }}">
+                    <label for="sheet_name">Nom de l'onglet EDT dans la feuille de calcul</label>
+                    <input type="text" name="sheet_name" id="sheet_name" placeholder="sheet_name" value="{{ config['DEFAULT_SHEET_NAME'] }}">
+                    <label for="student_sheet_id">Id du Google Sheet choix des cours</label>
+                    <input type="text" name="student_sheet_id" id="student_sheet_id" placeholder="student_sheet_id" value="{{ config['DEFAULT_STUDENT_SHEET_ID'] }}">
+                    <label for="student_sheet_name">Nom de l'onglet dans la feuille de calcul de choix</label>
+                    <input type="text" name="student_sheet_name" id="student_sheet_name" placeholder="student_sheet_name" value="{{ config['DEFAULT_STUDENT_SHEET_NAME'] }}">
+                    <button type="submit">Modifier</button>
+                </form>
+            </div>
             {% if unknown_courses %}
                 <h2>Cours inconnus</h2>
                 <table>

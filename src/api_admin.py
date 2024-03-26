@@ -1,4 +1,5 @@
-from flask import redirect
+import requests
+from flask import redirect, flash
 
 from src.api_flask import *
 
@@ -48,11 +49,59 @@ def fetch_unknown_courses():
 
 @app.route("/admin")
 def admin_view():
+    error = request.args.get('error')
     categories = fetch_courses()
     unknown_courses = fetch_unknown_courses()
     return render_template('admin.html',
                            categories=categories,
-                           unknown_courses=unknown_courses)
+                           unknown_courses=unknown_courses,
+                           error=error)
+
+
+@app.route("/admin/personalize_sheet", methods=['POST'])
+def personalize_sheet():
+    # store sheet_id, sheet_name, student_sheet_id, student_sheet_name
+    if request.method == 'POST':
+        sheet_id = request.form.get('sheet_id')
+        sheet_name = request.form.get('sheet_name')
+        student_sheet_id = request.form.get('student_sheet_id')
+        student_sheet_name = request.form.get('student_sheet_name')
+
+        try:
+            sheet_response = requests.get(f'https://docs.google.com/spreadsheets/d/{sheet_id}')
+            student_sheet_response = requests.get(f'https://docs.google.com/spreadsheets/d/{student_sheet_id}')
+
+            if sheet_response.status_code == 200 and student_sheet_response.status_code == 200:
+                # store in db
+                conn = sqlite3.connect('./uploads/serenadoit.db')
+                cursor = conn.cursor()
+
+                try:
+                    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    cursor.execute("INSERT INTO sheets (sheet_id, sheet_name, "
+                                   "student_sheet_id, student_sheet_name, date) "
+                                   "VALUES (?, ?, ?, ?, ?)",
+                                   (sheet_id, sheet_name, student_sheet_id, student_sheet_name, date))
+                    conn.commit()
+                    print("Sheets added successfully !")
+                except sqlite3.Error as e:
+                    print("Error while adding sheets to the database :", e)
+                    return redirect(url_for('admin_view',
+                                            error='Erreur lors de l\'ajout des configurations à la base de données.'))
+                finally:
+                    conn.close()
+            else:
+                print('Failed to access one or more of the Google Sheets. Please check the IDs and try again.')
+                return redirect(url_for('admin_view',
+                                        error='Au moins Google Sheet est inaccessible. '
+                                              'Veuillez vérifier les identifiants et réessayer.'))
+
+        except requests.exceptions.RequestException as e:
+            flash('An error occurred while trying to access the Google Sheets.', 'error')
+            return redirect(url_for('admin_view',
+                                    error='Une erreur est survenue lors de l\'accès aux Google Sheets.'))
+
+        return redirect(url_for('admin_view'))
 
 
 @app.route("/admin/delete_course", methods=['POST'])
@@ -98,5 +147,3 @@ def add_course():
             conn.close()
 
         return redirect(url_for('admin_view'))
-
-
