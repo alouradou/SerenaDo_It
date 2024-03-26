@@ -31,6 +31,7 @@ python ../src/db_manager.py
 Cela doit créer un fichier `./uploads/serenadoit.db` avec les tables suivantes : 
 - courses
 - unknown_courses
+- sheets
 
 On peut changer le lieu de la db mais il faut s'assurer que le code le supporte.
 Pour cela, exécuter le test associé après avoir exécuté `db_manager.py`.
