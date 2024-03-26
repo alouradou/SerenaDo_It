@@ -95,6 +95,9 @@ jobs:
           source serenadoit/bin/activate
           gunicorn -w 4 -b 0.0.0.0:10410 run_prod:app --error-logfile logs/error.log --access-logfile logs/access.log -D
 
+    - name: Wait before checking deployment
+      run: sleep 5s
+
     - name: Check deployment
       run: |
         ps aux | grep "^$USER" | grep '[g]unicorn' || true
