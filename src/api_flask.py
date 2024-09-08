@@ -18,7 +18,7 @@ app.template_folder = os.path.join(current_dir, '../frontend/templates')
 app.static_folder = os.path.join(current_dir, '../static')
 app.config['UPLOAD_FOLDER'] = './uploads'
 
-app.config['DEFAULT_SHEET_ID'] = "177HfBhAUT8XCkrVt-CFY1vD6mMOi-iFU3FKyUxIw7k8"
+app.config['DEFAULT_SHEET_ID'] = "17kuxrBvcNzASP_qjOXOe1Dh8Z9zpfJHg_JB0PzL6s08"
 app.config['DEFAULT_SHEET_NAME'] = "année"
 app.config['DEFAULT_STUDENT_SHEET_ID'] = "1KU6nJ8KGYOp4EH21jKKVwzF3vBDa8mDBaHFoaekx1ZU"
 app.config['DEFAULT_STUDENT_SHEET_NAME'] = "effectif"
