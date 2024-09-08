@@ -22,7 +22,7 @@
                     <select name="id" id="file-select">
                             <option value="0"> -- </option>
                         {% for index, student in student_df.iterrows() %}
-                            <option value="{{ index }}">{{ student["prénom"] }} {{ student["nom"] }} </option>
+                            <option value="{{ index }}">{{ student["prénom"] }} {{ student["nom de famille"] }} </option>
                         {% endfor %}
                     </select>
                 </label>

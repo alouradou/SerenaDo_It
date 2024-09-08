@@ -119,7 +119,7 @@ def get_student_calendar_from_list():
     custom_path = f"{secure_filename(student['prénom'])}-{secure_filename(student['nom'])}"
     filename = f"./uploads/edt-{custom_path}.xlsx"
 
-    timetable.create_timetable_automatic(student["nom"], student["prénom"], filename)
+    timetable.create_timetable_automatic(student["nom de famille"], student["prénom"], filename)
 
     data_manager = ExcelManager(filename, sheet_name)
 

@@ -145,9 +145,7 @@ class StudentDataManager(DataManager):
         try:
             df = df.drop([0, 1]).dropna(subset=["nom", "prénom"])
         except:
-            print(df.columns)
-            print(df)
-            # df = df.drop([0, 1]).dropna(subset=["Nom de famille", "Prénom"])
+            df = df.drop([0, 1]).dropna(subset=["nom de famille", "prénom"])
 
         return df
 
