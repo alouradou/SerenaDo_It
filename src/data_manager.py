@@ -142,7 +142,10 @@ class StudentDataManager(DataManager):
         df.columns = df.iloc[1]
         df.columns = [col.lower() for col in df.columns]
 
-        df = df.drop([0, 1]).dropna(subset=["nom", "prénom"])
+        try:
+            df = df.drop([0, 1]).dropna(subset=["nom", "prénom"])
+        except:
+            df = df.drop([0, 1]).dropna(subset=["Nom de famille", "Prénom"])
 
         return df
 
