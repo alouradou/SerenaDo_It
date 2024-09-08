@@ -116,7 +116,7 @@ def get_student_calendar_from_list():
         "./uploads/tmp_students.xlsx", student_sheet_name)
 
     student = students_df.loc[students_df.index == student_id].iloc[0]
-    custom_path = f"{secure_filename(student['prénom'])}-{secure_filename(student['nom'])}"
+    custom_path = f"{secure_filename(student['prénom'])}-{secure_filename(student['nom de famille'])}"
     filename = f"./uploads/edt-{custom_path}.xlsx"
 
     timetable.create_timetable_automatic(student["nom de famille"], student["prénom"], filename)
@@ -152,7 +152,7 @@ def get_student_calendar_from_list():
                            path="/ics?path=" + path,
                            full_course_path="/ics?path=" + full_course_path,
                            host=request.host_url.split("//")[1][:-1],
-                           displayed_name=f"{student['prénom']} {student['nom']}")
+                           displayed_name=f"{student['prénom']} {student['nom de famille']}")
 
 
 @app.route('/annee/source-excel', methods=['POST'])
