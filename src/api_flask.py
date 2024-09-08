@@ -21,7 +21,7 @@ app.config['UPLOAD_FOLDER'] = './uploads'
 app.config['DEFAULT_SHEET_ID'] = "17kuxrBvcNzASP_qjOXOe1Dh8Z9zpfJHg_JB0PzL6s08"
 app.config['DEFAULT_SHEET_NAME'] = "année"
 app.config['DEFAULT_STUDENT_SHEET_ID'] = "1ZMgJ7oZyIxTkz6Cj7Ko-sEQpEDAAw8SkJBjZ4Dtjaig"
-app.config['DEFAULT_STUDENT_SHEET_NAME'] = "effectif"
+app.config['DEFAULT_STUDENT_SHEET_NAME'] = "24-25"
 
 from src.api_admin import fetch_config, fetch_courses, admin_view
 
